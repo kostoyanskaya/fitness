@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if next %}
+    {% if current_user.is_authenticated %}
+      <p class="text-center">
+        У вашего аккаунта нет доступа к этой странице.
+        Чтобы продолжить, войдите в систему с аккаунтом,
+        у которого есть доступ.
+      </p>
+    {% else %}
+      <p class="text-center">
+        Пожалуйста, войдите в систему,
+        чтобы просматривать эту страницу.
+      </p>
+    {% endif %}
+  {% endif %}
+  <div class="col d-flex justify-content-center">
+    <div class="card" style="width: 40rem;">
+      <div class="card-header">
+        Войти в систему
+      </div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('login') }}">
+          {{ form.hidden_tag() }}  <!-- Для CSRF защиты, если используете Flask-WTF -->
+          <input type="hidden" name="next" value="{{ next }}">
+          
+          <div class="mb-3">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control") }}
+            {% for error in form.email.errors %}
+              <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control") }}
+            {% for error in form.password.errors %}
+              <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+          </div>
+          
+          <button type="submit" class="btn btn-primary">Войти</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+    <h1>Дашборд администрирования</h1>
+    <ul>
+        <li><a href="{{ url_for('exercisetype.index_view') }}">Управление тренировками</a></li>
+        <li><a href="{{ url_for('dayofweek.index_view') }}">Дни недели</a></li>
+        <li><a href="{{ url_for('coach.index_view') }}">Тренера</a></li>
+    </ul>
+{% endblock %}

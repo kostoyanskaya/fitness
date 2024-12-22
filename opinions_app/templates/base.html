@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ваш Заголовок</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styl.css') }}"> 
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">
+    <a href="#">SPORT</a>
+  </div>  
+  <nav>
+    <form class="search" action="search.php"> 
+      <input name="q" placeholder="Search..." type="search">
+    </form>
+    <ul>
+		<li><a href="{{ url_for('index_view') }}">О нас</a></li>
+            <li>
+                <a href="{{ url_for('book_workout') }}">Расписание</a>
+        <ul class="mega-dropdown">
+          <li class="row">
+            <ul class="mega-col">
+              <li><a href="#">Время занятий</a></li>
+              <li><a href="#">Ценообразование</a></li>
+            </ul>
+          </li>
+        </ul>        
+      </li>
+      <li class="dropdown">
+        <a href="">Личные тренировки</a>
+        <ul>
+          <li><a href="{{ url_for('login') }}">Войти в личный кабинет</a></li>
+          <li><a href="{{ url_for('register') }}">Регистрация</a></li>
+          <li><a href="#">Выйти</a></li>
+        </ul>        
+      </li>
+      <li><a href="">Тренера</a></li>
+      <li><a href="">Контакты</a></li>
+    </ul>
+  </nav>
+</div>
+
+  <body>
+
+    {% include "header.html" %} 
+    {% block content %}{% endblock content %}
+    <!-- Тут подключается шаблон footer.html. Его тоже скоро создадим -->
+    {% include "footer.html" %}
+  </body>
+</html>

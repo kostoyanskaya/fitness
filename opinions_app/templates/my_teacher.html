@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='my_teacher.css') }}"> 
+    <title>Тренеры</title>
+</head>
+<body>
+    <div class="coaches-container">
+        <h1>Наши Тренеры</h1>
+        <div class="coaches-list">
+            {% for coach in coaches %}
+            <div class="coach-card">
+                <img src="{{ url_for('static', filename=coach.photo) }}" alt="{{ coach.name }}" class="coach-photo">
+                <div class="coach-info">
+                    <h2>{{ coach.name }}</h2>
+                    <p class="exercise-type">{{ coach.workouts[0].exercise_type.name if coach.workouts else 'Нет информации' }}</p>
+                    <p class="description">{{ coach.description }}</p>
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        {{ form.exercise_type_id.label }} {{ form.exercise_type_id() }}<br>
+                        {{ form.day_of_week_id.label }} {{ form.day_of_week_id() }}<br>
+                        {{ form.date.label }} {{ form.date() }}<br>
+                        {{ form.time.label }} {{ form.time() }}<br>
+                        {{ form.submit() }}
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+{% endblock %}

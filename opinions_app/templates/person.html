@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesperson.css') }}"> 
+    <title>Личный кабинет</title>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="info-box">
+                <h1>{{ username }}</h1>  <!-- Отображение имени пользователя -->
+                <p>Email: {{ email }}</p>  <!-- Отображение почты пользователя -->
+                <div class="mini-table">
+                    <h2>Мои групповые тренировки</h2>
+                    <table>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Упражнение</th>
+                            <th>Тренер</th>
+                            <th>Запись</th>
+                        </tr>
+                        {% if workouts %}
+        {% for workout in workouts %}
+        <tr>
+            <td>{{ workout.date }}</td>
+            <td>{{ workout.time }}</td>
+            <td>{{ workout.exercise }}</td>
+            <td>{{ workout.coach }}</td>
+            <td>
+                <form action="{{ url_for('cancel_booking', booking_id=workout.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">Отменить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="4">Нет записанных тренировок.</td>
+        </tr>
+    {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <img src="{{ url_for('static', filename='sport.jpg') }}" alt="Большая картинка" class="large-image">
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

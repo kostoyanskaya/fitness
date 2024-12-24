@@ -1,56 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<div class="container">
-    <h1>Запись на тренировки</h1>
-    
-    <!-- Таблица с расписанием -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>День недели</th>
-                <th>Дата</th>
-                <th>Время</th>
-                <th>Вид занятия</th>
-                <th>Тренер</th>
-                <th>Записаться</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for workout in workouts %}
-            <tr>
-                <td>{{ workout.day }}</td>
-                <td>{{ workout.date }}</td>
-                <td>{{ workout.time }}</td>
-                <td>{{ workout.exercise }}</td>
-                <td>{{ workout.coach }}</td>
-                <td>
-                    <button class="btn btn-primary" onclick="bookWorkout('{{ workout.exercise }}', '{{ workout.date }}', '{{ workout.time }}')">Записаться</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    <div id="booking-message" class="alert alert-success" style="display: none;"></div>
-</div>
-
-<script>
-    function bookWorkout(exerciseName, workoutDate, workoutTime) {
-        // Формируем сообщение о записи
-        const message = `Вы успешно записаны. Тренировка состоится: ${exerciseName}, дата: ${workoutDate}, время: ${workoutTime}.`;
-        
-        // Отображаем сообщение
-        const messageDiv = document.getElementById('booking-message');
-        messageDiv.innerText = message;
-        messageDiv.style.display = 'block';
-    }
-</script>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylebook.css') }}"> 
+    <title>Запись на тренировки</title>
+</head>
+<body>
+    <div class="background-image"></div>
+    <div class="container">
+        <div class="info-box">
+            <h1>Запись на тренировки</h1>
+            <div class="training-table">
+                <h2>Расписание тренировок</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>День недели</th>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Вид занятия</th>
+                            <th>Тренер</th>
+                            <th>Записаться</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for workout in workouts %}
+                        <tr>
+                            <td>{{ workout.day }}</td>
+                            <td>{{ workout.date }}</td>
+                            <td>{{ workout.time }}</td>
+                            <td>{{ workout.exercise }}</td>
+                            <td>{{ workout.coach }}</td>
+                            <td>
+                                <form action="{{ url_for('book_workout') }}" method="post">
+                                    <input type="hidden" name="workout" value="{{ workout.id }}">
+                                    <button type="submit" class="btn btn-primary">Записаться</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div id="booking-message" class="alert alert-success" style="display: none;"></div>
+        </div>
+    </div>
 </body>
 </html>
 {% endblock %}

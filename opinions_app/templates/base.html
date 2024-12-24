@@ -6,6 +6,19 @@
     <title>Ваш Заголовок</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styl.css') }}"> 
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    body {
+        background-image: url('{{ url_for("static", filename="sport2.jpg") }}');
+        background-size: cover; /* Это растянет изображение так, чтобы оно заполнило весь фон */
+        background-position: center; /* Центрируем изображение */
+        line-height: 1.5;
+        font-family: sans-serif;
+        text-transform: uppercase;
+        font-size: 16px;
+        color: #fff;
+    }
+    a { text-decoration: none; color: #fff; }
+</style>
 </head>
 <body>
 
@@ -33,12 +46,16 @@
       <li class="dropdown">
         <a href="">Личные тренировки</a>
         <ul>
-          <li><a href="{{ url_for('login') }}">Войти в личный кабинет</a></li>
-          <li><a href="{{ url_for('register') }}">Регистрация</a></li>
-          <li><a href="#">Выйти</a></li>
+          <li><a href="{{ url_for('me_view') }}">Личный кабинет</a></li>
+          {% if not current_user.is_authenticated %}
+            <li><a href="{{ url_for('register') }}">Вход/Регистрация</a></li>
+        {% endif %}
+          {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('logout') }}">Выйти</a></li>
+        {% endif %}
         </ul>        
       </li>
-      <li><a href="">Тренера</a></li>
+      <li><a href="{{ url_for('teacher_view') }}">Тренера</a></li>
       <li><a href="">Контакты</a></li>
     </ul>
   </nav>
@@ -48,7 +65,6 @@
 
     {% include "header.html" %} 
     {% block content %}{% endblock content %}
-    <!-- Тут подключается шаблон footer.html. Его тоже скоро создадим -->
     {% include "footer.html" %}
   </body>
 </html>

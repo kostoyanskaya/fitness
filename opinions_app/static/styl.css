@@ -1,7 +1,16 @@
 HTML CSS JSResult Skip Results Iframe
 EDIT ON
 *, *:before, *:after {-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box;margin:0;padding:0}
-body{background:#bdc3c7;line-height:1.5;font-family:sans-serif;text-transform:uppercase;font-size:16px;color:#fff}
+body {
+  background-image: url('{{ url_for('static', filename='sport2.jpg') }}');
+  background-size: cover;
+  background-position: center;
+  line-height: 1.5;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #fff;
+}
 a{text-decoration:none;color:#fff}
 #header{background:#1E262D;width:100%;position:relative}
 #header:after{content:"";clear:both;display:block}
@@ -46,9 +55,39 @@ nav li li a:hover{background:#bdc3c7;background:#FAFBFB}
   nav li{float:none}
   nav ul li a{float:none;padding:8px;display:block}
   #header nav ul ul{display:block;position:static;background:none;border:none;padding:0}
-  #header nav a{color:#e51111;padding:8px}
+  #header nav a{color:#f8f8f8;padding:8px}
   #header nav a:hover{background:#fff;color:#333;border-radius:3px}
   #header nav ul li li a:before{content:"- "}
   .mega-col{width:100%}
 }
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 75vh; /* Занять всю высоту экрана */
+}
 
+.card {
+  border: 2px solid #040507; /* Рамка синего цвета */
+  border-radius: 14px; /* Закругленные углы */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Легкая тень */
+}
+
+.card-header {
+  font-size: 1.5rem; /* Увеличенный размер заголовка */
+}
+
+.form-control {
+  font-size: 1.2rem; /* Увеличенный размер шрифта для полей ввода */
+}
+
+.btn {
+  font-size: 1.2rem; /* Увеличенный размер кнопки */
+}
+.custom-header {
+  margin-right: 20px; /* Ajuste este valor según sea necesario */
+}
+
+.custom-button {
+  margin-right: 20px; /* Ajuste este valor según sea necesario */
+}

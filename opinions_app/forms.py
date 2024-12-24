@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, SelectField, DateField, TimeField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 from wtforms import Form, StringField
+from .models import ExerciseType, DayOfWeek, Coach
 
 
 class RegistrationForm(FlaskForm):
@@ -32,4 +33,19 @@ class BookingForm(FlaskForm):
     submit = SubmitField('Записаться')
 
 class ExerciseTypeForm(Form):
-    name = StringField('Name', validators=[DataRequired()]) 
+    name = StringField('Name', validators=[DataRequired()])
+
+
+class PersonalTrainingForm(FlaskForm):
+    exercise_type_id = SelectField('Тип упражнения', coerce=int, validators=[DataRequired()])
+    day_of_week_id = SelectField('День недели', coerce=int, validators=[DataRequired()])
+    coach_id = SelectField('Тренер', coerce=int, validators=[DataRequired()])
+    date = DateField('Дата', format='%Y-%m-%d', validators=[DataRequired()])
+    time = TimeField('Время', validators=[DataRequired()])
+    submit = SubmitField('Записаться')
+
+    def __init__(self, *args, **kwargs):
+        super(PersonalTrainingForm, self).__init__(*args, **kwargs)
+        self.exercise_type_id.choices = [(et.id, et.name) for et in ExerciseType.query.all()]
+        self.day_of_week_id.choices = [(dw.id, dw.name) for dw in DayOfWeek.query.all()]
+        self.coach_id.choices = [(c.id, c.name) for c in Coach.query.all()]

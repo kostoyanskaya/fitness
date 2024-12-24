@@ -37,6 +37,8 @@ class Coach(db.Model):
     __tablename__ = 'coach'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    photo = db.Column(db.String(255), nullable=True)  # Путь к фото тренера
+    description = db.Column(db.Text, nullable=True)  # Описание тренера
     workouts = db.relationship('Workout', backref='coach', lazy=True)
 
     def __repr__(self):
@@ -69,3 +71,20 @@ class Booking(db.Model):
 
     def __repr__(self):
         return f"Booking(user_id='{self.user_id}', workout_id='{self.workout_id}', date_booked='{self.date_booked}')"
+    
+
+class PersonalTraining(db.Model):
+    __tablename__ = 'personaltraining'
+    id = db.Column(db.Integer, primary_key=True)
+    exercise_type_id = db.Column(db.Integer, db.ForeignKey('exercise_type.id'), nullable=False)
+    day_of_week_id = db.Column(db.Integer, db.ForeignKey('day_of_week.id'), nullable=False)
+    coach_id = db.Column(db.Integer, db.ForeignKey('coach.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+
+    coach = db.relationship('Coach', backref='bookings')
+    exercise_type = db.relationship('ExerciseType')
+    day_of_week = db.relationship('DayOfWeek')
+
+    def __repr__(self):
+        return f"PersonalTraining('{self.id}', '{self.date}', '{self.time}')"

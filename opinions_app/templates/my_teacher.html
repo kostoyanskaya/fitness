@@ -18,8 +18,8 @@
                     <p class="description">{{ coach.description }}</p>
                     <form method="POST">
                         {{ form.hidden_tag() }}
-                        {{ form.exercise_type_id.label }} {{ form.exercise_type_id() }}<br>
-                        {{ form.day_of_week_id.label }} {{ form.day_of_week_id() }}<br>
+                        <input type="hidden" name="exercise_type_id" value="{{ coach.workouts[0].exercise_type.id if coach.workouts else '' }}">
+                        <input type="hidden" name="coach_id" value="{{ coach.id }}">
                         {{ form.date.label }} {{ form.date() }}<br>
                         {{ form.time.label }} {{ form.time() }}<br>
                         {{ form.submit() }}

@@ -73,6 +73,20 @@ class Booking(db.Model):
         return f"Booking(user_id='{self.user_id}', workout_id='{self.workout_id}', date_booked='{self.date_booked}')"
     
 
+class PersonalTrainingBooking(db.Model):
+    __tablename__ = 'personal_training_booking'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    personal_training_id = db.Column(db.Integer, db.ForeignKey('personaltraining.id'), nullable=False)
+    date_booked = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='personal_training_bookings')
+    personal_training = db.relationship('PersonalTraining', backref='bookings')
+
+    def __repr__(self):
+        return f"PersonalTrainingBooking(user_id='{self.user_id}', personal_training_id='{self.personal_training_id}', date_booked='{self.date_booked}')"
+
+
 class PersonalTraining(db.Model):
     __tablename__ = 'personaltraining'
     id = db.Column(db.Integer, primary_key=True)
@@ -82,7 +96,7 @@ class PersonalTraining(db.Model):
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
 
-    coach = db.relationship('Coach', backref='bookings')
+    coach = db.relationship('Coach', backref='personal_trainings')
     exercise_type = db.relationship('ExerciseType')
     day_of_week = db.relationship('DayOfWeek')
 

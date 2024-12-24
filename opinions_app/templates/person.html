@@ -11,8 +11,8 @@
     <div class="container">
         <div class="left-panel">
             <div class="info-box">
-                <h1>{{ username }}</h1>  <!-- Отображение имени пользователя -->
-                <p>Email: {{ email }}</p>  <!-- Отображение почты пользователя -->
+                <h1>{{ username }}</h1>
+                <p>Email: {{ email }}</p>
                 <div class="mini-table">
                     <h2>Мои групповые тренировки</h2>
                     <table>
@@ -39,9 +39,42 @@
         {% endfor %}
     {% else %}
         <tr>
-            <td colspan="4">Нет записанных тренировок.</td>
-        </tr>
-    {% endif %}
+            <td colspan="5">Нет записанных групповых тренировок.</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </div>
+
+                <!-- Добавьте новую секцию для персональных тренировок -->
+                <div class="mini-table">
+                    <h2>Мои персональные тренировки</h2>
+                    <table>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Упражнение</th>
+                            <th>Тренер</th>
+                            <th>Запись</th>
+                        </tr>
+                        {% if personal_workouts %}
+                            {% for personal_workout in personal_workouts %}
+                                <tr>
+                                    <td>{{ personal_workout.date }}</td>
+                                    <td>{{ personal_workout.time }}</td>
+                                    <td>{{ personal_workout.exercise }}</td>
+                                    <td>{{ personal_workout.coach }}</td>
+                                    <td>
+                                        <form action="{{ url_for('cancel_personal_booking', booking_id=personal_workout.id) }}" method="POST">
+                                            <button type="submit" class="btn btn-danger">Отменить</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5">Нет записанных персональных тренировок.</td>
+                            </tr>
+                        {% endif %}
                     </table>
                 </div>
             </div>

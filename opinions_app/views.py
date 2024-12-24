@@ -5,7 +5,7 @@ from opinions_app import app, db
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from .forms import RegistrationForm, LoginForm, WorkoutForm, BookingForm, PersonalTrainingForm
-from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining
+from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, PersonalTrainingBooking
 
 
 bcrypt = Bcrypt(app)
@@ -71,7 +71,7 @@ def index_view():
 @app.route('/me')
 def me_view():
     if current_user.is_authenticated:
-        # Получаем все тренировки, на которые записан пользователь
+        # Получаем все групповые тренировки
         bookings = Booking.query.filter_by(user_id=current_user.id).all()
         workout_details = []
 
@@ -85,7 +85,24 @@ def me_view():
                 'id': booking.id
             })
 
-        return render_template('person.html', username=current_user.username, email=current_user.email, workouts=workout_details)
+        # Получаем персональные тренировки
+        personal_trainings = PersonalTrainingBooking.query.filter_by(user_id=current_user.id).all()
+        personal_workout_details = []
+
+        for booking in personal_trainings:
+            training = booking.personal_training
+            personal_workout_details.append({
+                'date': training.date.strftime('%d.%m.%Y'),
+                'time': training.time.strftime('%H:%M'),
+                'exercise': training.exercise_type.name,
+                'coach': training.coach.name,
+                'id': booking.id
+            })
+
+        return render_template('person.html', username=current_user.username,
+                               email=current_user.email,
+                               workouts=workout_details,
+                               personal_workouts=personal_workout_details)
     else:
         return redirect(url_for('login'))
     
@@ -99,7 +116,19 @@ def cancel_booking(booking_id):
     else:
         flash('Не удалось отменить запись.', 'danger')
     
-    return redirect(url_for('me_view'))  
+    return redirect(url_for('me_view'))
+
+@app.route('/cancel_personal_booking/<int:booking_id>', methods=['POST'])
+def cancel_personal_booking(booking_id):
+    # Логика отмены персональной тренировки
+    personal_training = PersonalTraining.query.get(booking_id)
+    if personal_training and personal_training.user_id == current_user.id:
+        db.session.delete(personal_training)
+        db.session.commit()
+        flash('Персональная тренировка отменена.', 'success')
+    else:
+        flash('Не удалось отменить тренировку.', 'danger')
+    return redirect(url_for('me_view'))
 
 
 
@@ -155,18 +184,26 @@ def book_workout():
 def teacher_view():
     """Тренер страница."""
     coaches = Coach.query.all()
+    exercise_types = ExerciseType.query.all()
     form = PersonalTrainingForm()
-    
+
+    # Заполнение выборок
+    form.exercise_type_id.choices = [(et.id, et.name) for et in exercise_types]
+    form.coach_id.choices = [(c.id, c.name) for c in coaches]
     if form.validate_on_submit():
+        selected_date = form.date.data
+        day_of_week_id = selected_date.weekday()
         new_booking = PersonalTraining(
-            exercise_type_id=form.exercise_type_id.data,
-            day_of_week_id=form.day_of_week_id.data,
-            coach_id=form.coach_id.data,
+            exercise_type_id=request.form.get('exercise_type_id'),
+            day_of_week_id=day_of_week_id,
+            coach_id=request.form.get('coach_id'),
             date=form.date.data,
             time=form.time.data
         )
         db.session.add(new_booking)
+        print(new_booking)
         db.session.commit()
+
         flash('Вы успешно записаны на занятие!', 'success')
 
     return render_template('my_teacher.html', coaches=coaches, form=form)

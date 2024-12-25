@@ -5,7 +5,7 @@ from opinions_app import app, db
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from .forms import RegistrationForm, LoginForm, WorkoutForm, BookingForm, PersonalTrainingForm
-from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, PersonalTrainingBooking
+from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, Subscription
 
 
 bcrypt = Bcrypt(app)
@@ -41,7 +41,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('me_view'))
     username = request.form.get('username')
     password = request.form.get('password')
     if request.method == 'POST':
@@ -49,7 +49,7 @@ def login():
         print(user)
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for('index_view'))
+            return redirect(url_for('me_view'))
         else:
             flash('Login Unsuccessful. Please check your username and password', 'danger')
     return render_template('login.html')
@@ -71,7 +71,6 @@ def index_view():
 @app.route('/me')
 def me_view():
     if current_user.is_authenticated:
-        # Получаем все групповые тренировки
         bookings = Booking.query.filter_by(user_id=current_user.id).all()
         workout_details = []
 
@@ -85,18 +84,16 @@ def me_view():
                 'id': booking.id
             })
 
-        # Получаем персональные тренировки
-        personal_trainings = PersonalTrainingBooking.query.filter_by(user_id=current_user.id).all()
+        personal_trainings = PersonalTraining.query.filter_by(user_id=current_user.id).all()
         personal_workout_details = []
 
-        for booking in personal_trainings:
-            training = booking.personal_training
+        for personal_workout in personal_trainings:
             personal_workout_details.append({
-                'date': training.date.strftime('%d.%m.%Y'),
-                'time': training.time.strftime('%H:%M'),
-                'exercise': training.exercise_type.name,
-                'coach': training.coach.name,
-                'id': booking.id
+                'date': personal_workout.date.strftime('%d.%m.%Y'),
+                'time': personal_workout.time.strftime('%H:%M'),
+                'exercise': 'Персональная тренировка',
+                'coach': personal_workout.coach.name,
+                'id': personal_workout.id
             })
 
         return render_template('person.html', username=current_user.username,
@@ -120,7 +117,6 @@ def cancel_booking(booking_id):
 
 @app.route('/cancel_personal_booking/<int:booking_id>', methods=['POST'])
 def cancel_personal_booking(booking_id):
-    # Логика отмены персональной тренировки
     personal_training = PersonalTraining.query.get(booking_id)
     if personal_training and personal_training.user_id == current_user.id:
         db.session.delete(personal_training)
@@ -156,7 +152,7 @@ def add_workout():
 
 @app.route('/booking', methods=['GET', 'POST'])
 def book_workout():
-    form = BookingForm()  # Возможно, вам не нужно использовать этот объект формы.
+    form = BookingForm()
     workouts = Workout.query.all()
     workout_list = []
     for workout in workouts:
@@ -184,26 +180,41 @@ def book_workout():
 def teacher_view():
     """Тренер страница."""
     coaches = Coach.query.all()
-    exercise_types = ExerciseType.query.all()
     form = PersonalTrainingForm()
+    if request.method == 'POST':
+        form.process(formdata=request.form)
 
-    # Заполнение выборок
-    form.exercise_type_id.choices = [(et.id, et.name) for et in exercise_types]
-    form.coach_id.choices = [(c.id, c.name) for c in coaches]
-    if form.validate_on_submit():
-        selected_date = form.date.data
-        day_of_week_id = selected_date.weekday()
-        new_booking = PersonalTraining(
-            exercise_type_id=request.form.get('exercise_type_id'),
-            day_of_week_id=day_of_week_id,
-            coach_id=request.form.get('coach_id'),
-            date=form.date.data,
-            time=form.time.data
-        )
-        db.session.add(new_booking)
-        print(new_booking)
-        db.session.commit()
+        if form.validate_on_submit():
+            selected_date = form.date.data
+            day_of_week_id = selected_date.weekday()
+            coach_id = request.form.get('coach_id')
+            user_id = current_user.id
+            new_booking = PersonalTraining(
+                day_of_week_id=day_of_week_id,
+                coach_id=coach_id,
+                date=form.date.data,
+                time=form.time.data,
+                user_id=user_id
+            )
 
-        flash('Вы успешно записаны на занятие!', 'success')
+            db.session.add(new_booking)
+            db.session.commit()
+
+            flash('Вы успешно записаны на занятие!', 'success')
+            return redirect(url_for('teacher_view'))
+        else:
+            app.logger.error(f"Form errors: {form.errors}")
 
     return render_template('my_teacher.html', coaches=coaches, form=form)
+
+@app.route('/contacts')
+def information_view():
+    """Контакты."""
+    return render_template('contacts.html')
+
+@app.route('/price')
+def price_view():
+    """Ценообразование."""
+    subscriptions = Subscription.query.all()  # Получаем все абонементы из базы данных
+    return render_template('cost.html', subscriptions=subscriptions)
+

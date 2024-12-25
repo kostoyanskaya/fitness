@@ -37,8 +37,8 @@ class Coach(db.Model):
     __tablename__ = 'coach'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    photo = db.Column(db.String(255), nullable=True)  # Путь к фото тренера
-    description = db.Column(db.Text, nullable=True)  # Описание тренера
+    photo = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.Text, nullable=True)
     workouts = db.relationship('Workout', backref='coach', lazy=True)
 
     def __repr__(self):
@@ -71,34 +71,29 @@ class Booking(db.Model):
 
     def __repr__(self):
         return f"Booking(user_id='{self.user_id}', workout_id='{self.workout_id}', date_booked='{self.date_booked}')"
+
     
-
-class PersonalTrainingBooking(db.Model):
-    __tablename__ = 'personal_training_booking'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    personal_training_id = db.Column(db.Integer, db.ForeignKey('personaltraining.id'), nullable=False)
-    date_booked = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship('User', backref='personal_training_bookings')
-    personal_training = db.relationship('PersonalTraining', backref='bookings')
-
-    def __repr__(self):
-        return f"PersonalTrainingBooking(user_id='{self.user_id}', personal_training_id='{self.personal_training_id}', date_booked='{self.date_booked}')"
-
-
 class PersonalTraining(db.Model):
-    __tablename__ = 'personaltraining'
+    __tablename__ = 'personal_training'
+
     id = db.Column(db.Integer, primary_key=True)
-    exercise_type_id = db.Column(db.Integer, db.ForeignKey('exercise_type.id'), nullable=False)
-    day_of_week_id = db.Column(db.Integer, db.ForeignKey('day_of_week.id'), nullable=False)
-    coach_id = db.Column(db.Integer, db.ForeignKey('coach.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    day_of_week_id = db.Column(db.Integer, db.ForeignKey('day_of_week.id'), nullable=False)
+    coach_id = db.Column(db.Integer, db.ForeignKey('coach.id'), nullable=False)
 
     coach = db.relationship('Coach', backref='personal_trainings')
-    exercise_type = db.relationship('ExerciseType')
-    day_of_week = db.relationship('DayOfWeek')
+    day_of_week = db.relationship('DayOfWeek', backref='personal_trainings')
+    user = db.relationship('User', backref='personal_trainings')
 
     def __repr__(self):
-        return f"PersonalTraining('{self.id}', '{self.date}', '{self.time}')"
+        return f"<PersonalTraining('{self.date}', '{self.time}', 'User ID: {self.user_id}')>"
+    
+class Subscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+
+    def __repr__(self):
+        return f'<Subscription {self.name}>'

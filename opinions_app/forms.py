@@ -32,18 +32,13 @@ class BookingForm(FlaskForm):
     workout = SelectField('Выберите тренировку', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Записаться')
 
+
 class ExerciseTypeForm(Form):
     name = StringField('Name', validators=[DataRequired()])
 
 
 class PersonalTrainingForm(FlaskForm):
-    exercise_type_id = SelectField('Тип упражнения', coerce=int, validators=[DataRequired()])
-    coach_id = SelectField('Тренер', coerce=int, validators=[DataRequired()])
     date = DateField('Дата', format='%Y-%m-%d', validators=[DataRequired()])
     time = TimeField('Время', validators=[DataRequired()])
+    exercise_type_id = SelectField('Тип тренировки', choices=[(1, 'Персональная тренировка')], coerce=int, validators=[DataRequired()])
     submit = SubmitField('Записаться')
-
-    def __init__(self, *args, **kwargs):
-        super(PersonalTrainingForm, self).__init__(*args, **kwargs)
-        self.exercise_type_id.choices = [(et.id, et.name) for et in ExerciseType.query.all()]
-        self.coach_id.choices = [(c.id, c.name) for c in Coach.query.all()]

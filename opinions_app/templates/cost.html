@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ценообразование</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cost.css') }}">
+</head>
+<body>
+
+<div class="contacts-container">
+    <div class="nesolestag-enadenud">
+        <h3 style="text-align:center;">Стоимость услуг</h3>
+
+        {% for subscription in subscriptions %}
+        <div class="ico-wrap">
+            <div class="circle"></div>
+        </div>
+        <div class="meanous-andscoev">
+            <h4 class="aio-icon-title">{{ subscription.name }}</h4>
+            <div class="aio-icon-description">
+                Цена: {{ subscription.price }} рублей
+            </div>
+        </div>
+        <span class="kesednsoled"></span>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
+{% endblock %}

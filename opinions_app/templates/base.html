@@ -38,7 +38,7 @@
           <li class="row">
             <ul class="mega-col">
               <li><a href="#">Время занятий</a></li>
-              <li><a href="#">Ценообразование</a></li>
+              <li><a href="{{ url_for('price_view') }}">Ценообразование</a></li>
             </ul>
           </li>
         </ul>        
@@ -56,7 +56,7 @@
         </ul>        
       </li>
       <li><a href="{{ url_for('teacher_view') }}">Тренера</a></li>
-      <li><a href="">Контакты</a></li>
+      <li><a href="{{ url_for('information_view') }}">Контакты</a></li>
     </ul>
   </nav>
 </div>

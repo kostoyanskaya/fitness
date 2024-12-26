@@ -7,59 +7,11 @@ from flask_bcrypt import Bcrypt
 from .forms import RegistrationForm, LoginForm, WorkoutForm, BookingForm, PersonalTrainingForm
 from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, Subscription
 
-
 bcrypt = Bcrypt(app)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        fullname = request.form.get('fullname')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirmpassword = request.form.get('confirmpassword')
-        existing_user = User.query.filter_by(username=fullname).first()
-        
-        if existing_user:
-            flash('Username already exists! Please choose a different one.', 'danger')
-        elif password == confirmpassword:
-            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-            user = User(username=fullname, email=email, password=hashed_password)
-            print(user)
-            db.session.add(user)
-            try:
-                db.session.commit()
-                flash('Your account has been created! You can now log in.', 'success')
-                return redirect(url_for('login'))
-            except Exception as e:
-                db.session.rollback()
-                flash('An error occurred while creating your account. Please try again.', 'danger')
-        else:
-            flash('Passwords do not match!', 'danger')
-
     return render_template('login.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('me_view'))
-    username = request.form.get('username')
-    password = request.form.get('password')
-    if request.method == 'POST':
-        user = User.query.filter_by(username=username).first()
-        print(user)
-        if user and bcrypt.check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('me_view'))
-        else:
-            flash('Login Unsuccessful. Please check your username and password', 'danger')
-    return render_template('login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('me_view'))
-
 
 
 @app.route('/home')
@@ -101,7 +53,7 @@ def me_view():
                                workouts=workout_details,
                                personal_workouts=personal_workout_details)
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for('register'))
     
 @app.route('/cancel_booking/<int:booking_id>', methods=['POST'])
 def cancel_booking(booking_id):
@@ -215,6 +167,6 @@ def information_view():
 @app.route('/price')
 def price_view():
     """Ценообразование."""
-    subscriptions = Subscription.query.all()  # Получаем все абонементы из базы данных
+    subscriptions = Subscription.query.all()
     return render_template('cost.html', subscriptions=subscriptions)
 

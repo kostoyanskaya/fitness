@@ -13,7 +13,6 @@ login_manager.login_view = 'login'
 
 from .models import User
 
-from .admin import admin
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -50,9 +50,9 @@
           {% if not current_user.is_authenticated %}
             <li><a href="{{ url_for('register') }}">Вход/Регистрация</a></li>
         {% endif %}
-          {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('logout') }}">Выйти</a></li>
-        {% endif %}
+        {% if current_user.is_authenticated %}
+        <li><a href="#" id="logout-button">Выйти</a></li>
+       {% endif %}
         </ul>        
       </li>
       <li><a href="{{ url_for('teacher_view') }}">Тренера</a></li>
@@ -60,8 +60,30 @@
     </ul>
   </nav>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() { // Ждем, пока документ загрузится
+      const logoutButton = document.getElementById('logout-button');
+      if (logoutButton) {
+          logoutButton.onclick = async (e) => {
+              e.preventDefault(); // Предотвращаем переход по ссылке
 
-  <body>
+              const response = await fetch('/api/logout', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+              });
+
+              if (response.ok) {
+                  // Если выход успешен, перенаправляем на страницу входа или главную
+                  window.location.href = '/home'; // или '/home'
+              } else {
+                  console.error('Ошибка выхода');
+              }
+          };
+      }
+  });
+</script>
 
     {% include "header.html" %} 
     {% block content %}{% endblock content %}

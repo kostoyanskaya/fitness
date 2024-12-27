@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template, flash, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from .models import db, User, ExerciseType, DayOfWeek, Coach, Subscription, Workout
+from .models import db, User, ExerciseType, DayOfWeek, Coach, Subscription, Workout, Booking, PersonalTraining
 from opinions_app import app
 from flask_login import login_user, logout_user, login_required
 from flask_login import current_user
@@ -186,20 +186,14 @@ def handle_workouts():
 
     elif request.method == 'POST':
         data = request.get_json()
-
-        # Преобразуем строку даты в объект date
         date_value = datetime.strptime(data['date'], '%Y-%m-%d').date()
-
-        # Преобразуем строку времени в объект time
         time_value = datetime.strptime(data['time'], '%H:%M:%S').time()
-
-        # Создаем новый объект Workout
         new_workout = Workout(
             exercise_type_id=data['exercise_type_id'],
             day_of_week_id=data['day_of_week_id'],
             coach_id=data['coach_id'],
-            date=date_value,  # Используем преобразованный объект date
-            time=time_value   # Используем преобразованный объект time
+            date=date_value,
+            time=time_value
         )
 
         db.session.add(new_workout)
@@ -213,3 +207,108 @@ def handle_workouts():
             'date': new_workout.date.isoformat(),
             'time': new_workout.time.isoformat()
         }), 201
+
+
+@app.route('/api/bookings', methods=['POST'])
+def book_workouts():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    workout_id = data['workout_id']
+
+    new_booking = Booking(user_id=user_id, workout_id=workout_id)
+    db.session.add(new_booking)
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Successfully booked workout.',
+        'booking_id': new_booking.id
+    }), 201
+
+@app.route('/api/personal_trainings', methods=['POST'])
+def book_personal_training():
+    data = request.get_json()
+    user_id = int(data.get('user_id'))
+    coach_id = int(data.get('coach_id'))
+    day_of_week_id = int(data.get('day_of_week_id'))
+    date_str = data.get('date')
+    time_str = data.get('time')
+    date_value = datetime.strptime(date_str, '%Y-%m-%d').date()
+    time_value = datetime.strptime(time_str, '%H:%M').time()
+
+    new_training = PersonalTraining(
+        user_id=user_id,
+        coach_id=coach_id,
+        day_of_week_id=day_of_week_id,
+        date=date_value,
+        time=time_value
+    )
+    print(new_training)
+    
+    db.session.add(new_training)
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Successfully booked personal training.',
+        'personal_training_id': new_training.id
+    }), 201
+
+
+@app.route('/api/user/trainings', methods=['GET'])
+def get_user_trainings():
+    if current_user.is_authenticated:
+        bookings = Booking.query.filter_by(user_id=current_user.id).all()
+        workouts = []
+        print(workouts)
+        for booking in bookings:
+            workout = Workout.query.get(booking.workout_id)
+            exercise_type = ExerciseType.query.get(workout.exercise_type_id)  # Получаем тип упражнения
+            coach = Coach.query.get(workout.coach_id)  # Получаем тренера
+            workouts.append({
+                'id': workout.id,
+                'date': workout.date.strftime('%Y-%m-%d'),
+                'time': workout.time.strftime('%H:%M'),
+                'exercise': exercise_type.name if exercise_type else 'Unknown',  # Название упражнения
+                'coach': coach.name if coach else 'Unknown'  # Имя тренера
+            })
+
+        personal_workouts = PersonalTraining.query.filter_by(user_id=current_user.id).all()
+        personal_workouts_data = []
+        for personal_workout in personal_workouts:
+            exercise_type = ExerciseType.query.get(personal_workout.exercise_type_id)  # Получаем тип упражнения
+            coach = Coach.query.get(personal_workout.coach_id)  # Получаем тренера
+            personal_workouts_data.append({
+                'id': personal_workout.id,
+                'date': personal_workout.date.strftime('%Y-%m-%d'),
+                'time': personal_workout.time.strftime('%H:%M'),
+                'exercise': exercise_type.name if exercise_type else 'Unknown',  # Название упражнения
+                'coach': coach.name if coach else 'Unknown'  # Имя тренера
+            })
+
+        return jsonify({
+            'workouts': workouts,
+            'personal_workouts': personal_workouts_data
+        }), 200
+    else:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+@app.route('/cancel_booking/<int:booking_id>', methods=['DELETE'])
+def cancel_booking(booking_id):
+    if current_user.is_authenticated:
+        booking = Booking.query.filter_by(id=booking_id, user_id=current_user.id).first()
+        if booking:
+            db.session.delete(booking)
+            db.session.commit()
+            return jsonify({'status': 'success', 'message': 'Запись на тренировку отменена.'}), 200
+        return jsonify({'status': 'error', 'message': 'Запись не найдена.'}), 404
+    return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+
+@app.route('/cancel_personal_booking/<int:personal_booking_id>', methods=['DELETE'])
+def cancel_personal_booking(personal_booking_id):
+    if current_user.is_authenticated:
+        personal_booking = PersonalTraining.query.filter_by(id=personal_booking_id, user_id=current_user.id).first()
+        if personal_booking:
+            db.session.delete(personal_booking)
+            db.session.commit()
+            return jsonify({'status': 'success', 'message': 'Персональная тренировка отменена.'}), 200
+        return jsonify({'status': 'error', 'message': 'Персональная тренировка не найдена.'}), 404
+    return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401

@@ -6,6 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylebook.css') }}"> 
     <title>Запись на тренировки</title>
+        <script>
+        async function bookWorkout(workoutId) {
+       const userId = {{ current_user.id }};
+       try {
+           const response = await fetch('/api/bookings', {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({ user_id: userId, workout_id: workoutId })
+           });
+
+           if (!response.ok) {
+               const errorData = await response.json();
+               throw new Error(errorData.message || 'Ошибка записи на тренировку');
+           }
+
+           const data = await response.json();
+           alert(data.message);
+       } catch (error) {
+           alert('Ошибка: ' + error.message);
+       }
+   }
+        </script>
 </head>
 <body>
     <div class="background-image"></div>
@@ -28,25 +52,20 @@
                     <tbody>
                         {% for workout in workouts %}
                         <tr>
-                            <td>{{ workout.day }}</td>
-                            <td>{{ workout.date }}</td>
-                            <td>{{ workout.time }}</td>
-                            <td>{{ workout.exercise }}</td>
-                            <td>{{ workout.coach }}</td>
+                            <td>{{ workout.day_of_week.name }}</td>
+                            <td>{{ workout.date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ workout.time.strftime('%H:%M:%S') }}</td>
+                            <td>{{ workout.exercise_type.name }}</td>
+                            <td>{{ workout.coach.name }}</td>
                             <td>
-                                <form action="{{ url_for('book_workout') }}" method="post">
-                                    <input type="hidden" name="workout" value="{{ workout.id }}">
-                                    <button type="submit" class="btn btn-primary">Записаться</button>
-                                </form>
+                                <button onclick="bookWorkout({{ workout.id }})" class="btn btn-primary">Записаться</button>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            <div id="booking-message" class="alert alert-success" style="display: none;"></div>
         </div>
     </div>
 </body>
-</html>
 {% endblock %}

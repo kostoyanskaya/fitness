@@ -16,18 +16,79 @@
                     <h2>{{ coach.name }}</h2>
                     <p class="exercise-type">{{ coach.workouts[0].exercise_type.name if coach.workouts else 'Нет информации' }}</p>
                     <p class="description">{{ coach.description }}</p>
-                    <form method="POST">
-                        {{ form.hidden_tag() }}
+                </div>
+                <div class="booking-form">
+                    <form id="booking-form" onsubmit="return bookPersonalTraining(event)">
                         <input type="hidden" name="coach_id" value="{{ coach.id }}">
-                        {{ form.exercise_type_id.label }} {{ form.exercise_type_id() }}<br>
-                        {{ form.date.label }} {{ form.date() }}<br>
-                        {{ form.time.label }} {{ form.time() }}<br>
-                        {{ form.submit() }}
+                        <table>
+                            <tr>
+                                <td><label for="date">Дата:</label></td>
+                                <td><input type="date" id="date" name="date" required></td>
+                            </tr>
+                            <tr>
+                                <td><label for="time">Время:</label></td>
+                                <td><input type="time" id="time" name="time" required></td>
+                            </tr>
+                            <tr>
+                                <td><label for="day_of_week_id">День недели:</label></td>
+                                <td>
+                                    <select id="day_of_week_id" name="day_of_week_id" required>
+                                        <option value="1">Понедельник</option>
+                                        <option value="2">Вторник</option>
+                                        <option value="3">Среда</option>
+                                        <option value="4">Четверг</option>
+                                        <option value="5">Пятница</option>
+                                        <option value="6">Суббота</option>
+                                        <option value="7">Воскресенье</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <button type="submit">Записаться на тренировку</button>
+                                </td>
+                            </tr>
+                        </table>
                     </form>
                 </div>
-            </div>
+
             {% endfor %}
         </div>
     </div>
+    <script>
+        async function bookPersonalTraining(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            const data = {
+                user_id: 1,
+                coach_id: formData.get('coach_id'),
+                day_of_week_id: formData.get('day_of_week_id'),
+                date: formData.get('date'),
+                time: formData.get('time')
+            };
+
+            try {
+                const response = await fetch('/api/personal_trainings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при бронировании тренировки');
+                }
+
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    </script>
 </body>
 {% endblock %}

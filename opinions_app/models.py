@@ -54,10 +54,7 @@ class Workout(db.Model):
     time = db.Column(db.Time, nullable=False)
 
     def __repr__(self):
-        return (f"Workout(exercise_type='{self.exercise_type.name}', "
-                f"day_of_week='{self.day_of_week.name}', "
-                f"coach='{self.coach.name}', "
-                f"date='{self.date}', time='{self.time}')")
+        return f"<Workout {self.id}>"
 
 class Booking(db.Model):
     __tablename__ = 'booking'

@@ -6,81 +6,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesperson.css') }}"> 
     <title>Личный кабинет</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/user/trainings');
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки тренировок');
+                }
+                const data = await response.json();
+                displayWorkouts(data.workouts, data.personal_workouts);
+            } catch (error) {
+                console.error('Ошибка:', error.message);
+                alert('Не удалось загрузить данные о тренировках');
+            }
+        });
+
+        function displayWorkouts(workouts, personalWorkouts) {
+            const workoutsTable = document.getElementById('workoutsTable');
+            const personalWorkoutsTable = document.getElementById('personalWorkoutsTable');
+            if (workouts.length === 0) {
+                workoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных групповых тренировок.</td></tr>';
+            } else {
+                workouts.forEach(workout => {
+                    const row = `<tr>
+                        <td>${workout.date}</td>
+                        <td>${workout.time}</td>
+                        <td>${workout.exercise}</td>
+                        <td>${workout.coach}</td>
+                        <td>
+                            <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
+                        <button type="submit" class="btn btn-danger">Отменить</button>
+                    </form>
+                        </td>
+                    </tr>`;
+                    workoutsTable.insertAdjacentHTML('beforeend', row);
+                });
+            }
+            if (personalWorkouts.length === 0) {
+                personalWorkoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных персональных тренировок.</td></tr>';
+            } else {
+                personalWorkouts.forEach(personalWorkout => {
+                    const row = `<tr>
+                        <td>${personalWorkout.date}</td>
+                        <td>${personalWorkout.time}</td>
+                        <td>${personalWorkout.exercise}</td>
+                        <td>${personalWorkout.coach}</td>
+                        <td>
+                            <form action="/cancel_personal_booking/${personalWorkout.id}" method="POST">
+                                <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
+                                    <button type="submit" class="btn btn-danger">Отменить</button>
+                                </form>
+                            </form>
+                        </td>
+                    </tr>`;
+                    personalWorkoutsTable.insertAdjacentHTML('beforeend', row);
+                });
+            }
+        }
+        function cancelBooking(bookingId) {
+            fetch(`/cancel_booking/${bookingId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') {
+                        loadUserTrainings();
+                    }
+                });
+        }
+
+        function cancelPersonalBooking(bookingId) {
+            fetch(`/cancel_personal_booking/${bookingId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') {
+                        loadUserTrainings();
+                    }
+                });
+        }
+    </script>
 </head>
 <body>
-    <div class="container">
-        <div class="left-panel">
-            <div class="info-box">
-                <h1>{{ username }}</h1>
-                <p>Email: {{ email }}</p>
-                <div class="mini-table">
-                    <h2>Мои групповые тренировки</h2>
-                    <table>
-                        <tr>
-                            <th>Дата</th>
-                            <th>Время</th>
-                            <th>Упражнение</th>
-                            <th>Тренер</th>
-                            <th>Запись</th>
-                        </tr>
-                        {% if workouts %}
-        {% for workout in workouts %}
-        <tr>
-            <td>{{ workout.date }}</td>
-            <td>{{ workout.time }}</td>
-            <td>{{ workout.exercise }}</td>
-            <td>{{ workout.coach }}</td>
-            <td>
-                <form action="{{ url_for('cancel_booking', booking_id=workout.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger">Отменить</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
-            <td colspan="5">Нет записанных групповых тренировок.</td>
-                            </tr>
-                        {% endif %}
-                    </table>
-                </div>
-                <div class="mini-table">
-                    <h2>Мои персональные тренировки</h2>
-                    <table>
-                        <tr>
-                            <th>Дата</th>
-                            <th>Время</th>
-                            <th>Упражнение</th>
-                            <th>Тренер</th>
-                            <th>Запись</th>
-                        </tr>
-                        {% if personal_workouts %}
-                            {% for personal_workout in personal_workouts %}
-                                <tr>
-                                    <td>{{ personal_workout.date }}</td>
-                                    <td>{{ personal_workout.time }}</td>
-                                    <td>{{ personal_workout.exercise }}</td>
-                                    <td>{{ personal_workout.coach }}</td>
-                                    <td>
-                                        <form action="{{ url_for('cancel_personal_booking', booking_id=personal_workout.id) }}" method="POST">
-                                            <button type="submit" class="btn btn-danger">Отменить</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="5">Нет записанных персональных тренировок.</td>
-                            </tr>
-                        {% endif %}
-                    </table>
-                </div>
-            </div>
+    <div class="container mt-5">
+        <h1>Мой Личный Кабинет</h1>
+        
+        <div class="mini-table mt-4">
+            <h2>Мои групповые тренировки</h2>
+            <table class="table table-bordered" id="workoutsTable">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Упражнение</th>
+                        <th>Тренер</th>
+                        <th>Запись</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
-        <div class="right-panel">
-            <img src="{{ url_for('static', filename='sport.jpg') }}" alt="Большая картинка" class="large-image">
+        
+        <div class="mini-table mt-4">
+            <h2>Мои персональные тренировки</h2>
+            <table class="table table-bordered" id="personalWorkoutsTable">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Упражнение</th>
+                        <th>Тренер</th>
+                        <th>Запись</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
 {% endblock %}

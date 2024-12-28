@@ -2,7 +2,7 @@
 
 {% block content %}
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='my_teacher.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='my_teacher.css') }}">
     <title>Тренеры</title>
 </head>
 <body>
@@ -30,20 +30,6 @@
                                 <td><input type="time" id="time" name="time" required></td>
                             </tr>
                             <tr>
-                                <td><label for="day_of_week_id">День недели:</label></td>
-                                <td>
-                                    <select id="day_of_week_id" name="day_of_week_id" required>
-                                        <option value="1">Понедельник</option>
-                                        <option value="2">Вторник</option>
-                                        <option value="3">Среда</option>
-                                        <option value="4">Четверг</option>
-                                        <option value="5">Пятница</option>
-                                        <option value="6">Суббота</option>
-                                        <option value="7">Воскресенье</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
                                 <td colspan="2">
                                     <button type="submit">Записаться на тренировку</button>
                                 </td>
@@ -51,44 +37,43 @@
                         </table>
                     </form>
                 </div>
-
+            </div>
             {% endfor %}
         </div>
     </div>
     <script>
         async function bookPersonalTraining(event) {
-            event.preventDefault();
+    event.preventDefault();
 
-            const form = event.target;
-            const formData = new FormData(form);
+    const form = event.target;
+    const formData = new FormData(form);
 
-            const data = {
-                user_id: 1,
-                coach_id: formData.get('coach_id'),
-                day_of_week_id: formData.get('day_of_week_id'),
-                date: formData.get('date'),
-                time: formData.get('time')
-            };
+    const data = {
+        coach_id: formData.get('coach_id'),
+        date: formData.get('date'),
+        time: formData.get('time')
+    };
 
-            try {
-                const response = await fetch('/api/personal_trainings', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
+    try {
+        const response = await fetch('/api/personal_trainings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
 
-                if (!response.ok) {
-                    throw new Error('Ошибка при бронировании тренировки');
-                }
-
-                const result = await response.json();
-                alert(result.message);
-            } catch (error) {
-                alert(error.message);
-            }
+        if (!response.ok) {
+            throw new Error('Ошибка при бронировании тренировки');
         }
+
+        const result = await response.json();
+        alert(result.message);
+        form.reset();
+    } catch (error) {
+        alert(error.message);
+    }
+}
     </script>
 </body>
 {% endblock %}

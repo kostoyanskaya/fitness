@@ -22,55 +22,60 @@
         });
 
         function displayWorkouts(workouts, personalWorkouts) {
-            const workoutsTable = document.getElementById('workoutsTable');
-            const personalWorkoutsTable = document.getElementById('personalWorkoutsTable');
-            if (workouts.length === 0) {
-                workoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных групповых тренировок.</td></tr>';
-            } else {
-                workouts.forEach(workout => {
-                    const row = `<tr>
-                        <td>${workout.date}</td>
-                        <td>${workout.time}</td>
-                        <td>${workout.exercise}</td>
-                        <td>${workout.coach}</td>
-                        <td>
-                            <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
+    const workoutsTable = document.getElementById('workoutsTable');
+    const personalWorkoutsTable = document.getElementById('personalWorkoutsTable');
+    
+    if (workouts.length === 0) {
+        workoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных групповых тренировок.</td></tr>';
+    } else {
+        workouts.forEach(workout => {
+            const row = `<tr>
+                <td>${workout.date}</td>
+                <td>${workout.time}</td>
+                <td>${workout.exercise}</td>
+                <td>${workout.coach}</td>
+                <td>
+                    <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
                         <button type="submit" class="btn btn-danger">Отменить</button>
                     </form>
-                        </td>
-                    </tr>`;
-                    workoutsTable.insertAdjacentHTML('beforeend', row);
-                });
-            }
-            if (personalWorkouts.length === 0) {
-                personalWorkoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных персональных тренировок.</td></tr>';
-            } else {
-                personalWorkouts.forEach(personalWorkout => {
-                    const row = `<tr>
-                        <td>${personalWorkout.date}</td>
-                        <td>${personalWorkout.time}</td>
-                        <td>${personalWorkout.exercise}</td>
-                        <td>${personalWorkout.coach}</td>
-                        <td>
-                            <form action="/cancel_personal_booking/${personalWorkout.id}" method="POST">
-                                <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
-                                    <button type="submit" class="btn btn-danger">Отменить</button>
-                                </form>
-                            </form>
-                        </td>
-                    </tr>`;
-                    personalWorkoutsTable.insertAdjacentHTML('beforeend', row);
-                });
-            }
-        }
-        function cancelBooking(bookingId) {
-            fetch(`/cancel_booking/${bookingId}`, { method: 'DELETE' })
+                </td>
+            </tr>`;
+            workoutsTable.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    if (personalWorkouts.length === 0) {
+        personalWorkoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных персональных тренировок.</td></tr>';
+    } else {
+        personalWorkouts.forEach(personalWorkout => {
+            const row = `<tr>
+                <td>${personalWorkout.date}</td>
+                <td>${personalWorkout.time}</td>
+                <td>${personalWorkout.exercise}</td>
+                <td>${personalWorkout.coach}</td>
+                <td>
+                    <form onsubmit="event.preventDefault(); cancelBooking(${personalWorkout.id});" method="POST">
+                        <button type="submit" class="btn btn-danger">Отменить</button>
+                    </form>
+                </td>
+            </tr>`;
+            personalWorkoutsTable.insertAdjacentHTML('beforeend', row);
+        });
+    }
+}
+    function cancelBooking(bookingId) {
+            console.log('Cancel booking for ID:', bookingId); // Отладка
+            fetch(`/api/cancel_booking/${bookingId}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
                     if (data.status === 'success') {
                         loadUserTrainings();
                     }
+                })
+                .catch(error => {
+                    console.error('Ошибка при отмене бронирования:', error.message);
+                    alert('Не удалось отменить бронирование.');
                 });
         }
 

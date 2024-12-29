@@ -311,7 +311,7 @@ def cancel_booking(workout_id):
 
     return jsonify({'message': 'Booking cancelled successfully.', 'status': 'success'}), 200
 
-@app.route('/cancel_personal_booking/<int:personal_booking_id>', methods=['DELETE'])
+@app.route('/api/cancel_personal_booking/<int:personal_booking_id>', methods=['DELETE'])
 def cancel_personal_booking(personal_booking_id):
     if current_user.is_authenticated:
         personal_booking = PersonalTraining.query.filter_by(id=personal_booking_id, user_id=current_user.id).first()

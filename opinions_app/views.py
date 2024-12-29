@@ -9,7 +9,7 @@ from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, Pers
 
 bcrypt = Bcrypt(app)
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register')
 def register():
     return render_template('login.html')
 
@@ -28,13 +28,13 @@ def me_view():
         return redirect(url_for('register'))
     
 
-@app.route('/booking', methods=['GET', 'POST'])
+@app.route('/booking')
 def book_workout():
     workouts = Workout.query.all()
     return render_template('book_workout.html', workouts=workouts)
 
 
-@app.route('/teacher', methods=['GET', 'POST'])
+@app.route('/teacher')
 def teacher_view():
     """Тренер страница."""
     coaches = Coach.query.all()

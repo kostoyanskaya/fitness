@@ -18,4 +18,4 @@ from .models import User
 def load_user(user_id):
     return User.query.get(user_id)
 
-from . import api_views, cli_commands, error_handlers, views
+from . import api_views, cli_commands, error_handlers, views, admin

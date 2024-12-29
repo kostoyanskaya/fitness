@@ -54,8 +54,9 @@
                 <td>${personalWorkout.exercise}</td>
                 <td>${personalWorkout.coach}</td>
                 <td>
-                    <form onsubmit="event.preventDefault(); cancelBooking(${personalWorkout.id});" method="POST">
-                        <button type="submit" class="btn btn-danger">Отменить</button>
+                    <form onsubmit="event.preventDefault();
+                    cancelPersonalBooking(${personalWorkout.id});" method="POST">
+                    <button type="submit" class="btn btn-danger">Отменить</button>
                     </form>
                 </td>
             </tr>`;
@@ -63,9 +64,9 @@
         });
     }
 }
-    function cancelBooking(bookingId) {
-            console.log('Cancel booking for ID:', bookingId); // Отладка
-            fetch(`/api/cancel_booking/${bookingId}`, { method: 'DELETE' })
+        function cancelBooking(bookingId) {
+            console.log('Cancel booking for ID:', bookingId);
+            fetch(`/api/bookings/${bookingId}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
@@ -79,14 +80,19 @@
                 });
         }
 
+        
         function cancelPersonalBooking(bookingId) {
-            fetch(`/cancel_personal_booking/${bookingId}`, { method: 'DELETE' })
+            fetch(`/api/cancel_personal_booking/${bookingId}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
                     if (data.status === 'success') {
                         loadUserTrainings();
                     }
+                })
+                .catch(error => {
+                    console.error('Ошибка при отмене бронирования:', error.message);
+                    alert('Не удалось отменить бронирование.');
                 });
         }
     </script>

@@ -6,8 +6,11 @@ from flask_login import login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from .forms import RegistrationForm, LoginForm, WorkoutForm, BookingForm, PersonalTrainingForm
 from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, Subscription
+from werkzeug.utils import secure_filename
+
 
 bcrypt = Bcrypt(app)
+
 
 @app.route('/register')
 def register():

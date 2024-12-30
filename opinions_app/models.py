@@ -19,7 +19,7 @@ class ExerciseType(db.Model):
     __tablename__ = 'exercise_type'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-    workouts = db.relationship('Workout', backref='exercise_type', lazy=True)
+    workouts = db.relationship('Workout', backref='exercise_type', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"ExerciseType('{self.name}')"
@@ -27,8 +27,8 @@ class ExerciseType(db.Model):
 class DayOfWeek(db.Model):
     __tablename__ = 'day_of_week'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(10), unique=True, nullable=False)
-    workouts = db.relationship('Workout', backref='day_of_week', lazy=True)
+    name = db.Column(db.String(12), unique=True, nullable=False)
+    workouts = db.relationship('Workout', backref='day_of_week', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"DayOfWeek('{self.name}')"
@@ -59,30 +59,28 @@ class Workout(db.Model):
 class Booking(db.Model):
     __tablename__ = 'booking'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     workout_id = db.Column(db.Integer, db.ForeignKey('workout.id'), nullable=False)
     date_booked = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref='bookings')
+    user = db.relationship('User', backref=db.backref('bookings', passive_deletes=True))
     workout = db.relationship('Workout', backref='bookings')
 
     def __repr__(self):
         return f"Booking(user_id='{self.user_id}', workout_id='{self.workout_id}', date_booked='{self.date_booked}')"
 
-    
 class PersonalTraining(db.Model):
     __tablename__ = 'personal_training'
-
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     day_of_week_id = db.Column(db.Integer, db.ForeignKey('day_of_week.id'), nullable=False)
     coach_id = db.Column(db.Integer, db.ForeignKey('coach.id'), nullable=False)
 
     coach = db.relationship('Coach', backref='personal_trainings')
     day_of_week = db.relationship('DayOfWeek', backref='personal_trainings')
-    user = db.relationship('User', backref='personal_trainings')
+    user = db.relationship('User', backref=db.backref('personal_trainings', passive_deletes=True))
 
     def __repr__(self):
         return f"<PersonalTraining('{self.date}', '{self.time}', 'User ID: {self.user_id}')>"

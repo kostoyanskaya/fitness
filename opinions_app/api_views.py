@@ -130,11 +130,19 @@ def handle_coaches():
         return jsonify(coaches_list), 200
 
     elif request.method == 'POST':
-        data = request.get_json()
-        new_coach = Coach(name=data['name'], photo=data.get('photo'), description=data.get('description'))
-        db.session.add(new_coach)
-        db.session.commit()
-        return jsonify({'id': new_coach.id, 'name': new_coach.name}), 201
+        if 'photo' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+
+        file = request.files['photo']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+
+        if file:
+            filename = save_file(file)
+            new_coach = Coach(name=request.form['name'], photo=filename, description=request.form.get('description'))
+            db.session.add(new_coach)
+            db.session.commit()
+            return jsonify({'id': new_coach.id, 'name': new_coach.name}), 201
 
 @app.route('/api/coaches/<int:id>', methods=['DELETE'])
 def delete_coach(id):

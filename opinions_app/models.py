@@ -37,7 +37,7 @@ class Coach(db.Model):
     __tablename__ = 'coach'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    photo = db.Column(db.String(255), nullable=True)
+    photo = db.Column(db.String(400), nullable=True)
     description = db.Column(db.Text, nullable=True)
     workouts = db.relationship('Workout', backref='coach', lazy=True)
 

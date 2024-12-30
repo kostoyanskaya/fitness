@@ -6,6 +6,11 @@ from opinions_app import app
 from flask_login import login_user, logout_user, login_required
 from flask_login import current_user
 from datetime import datetime
+import os
+import requests
+from flask import Flask, request, jsonify
+from werkzeug.utils import secure_filename
+
 
 bcrypt = Bcrypt(app)
 
@@ -130,19 +135,32 @@ def handle_coaches():
         return jsonify(coaches_list), 200
 
     elif request.method == 'POST':
-        if 'photo' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
+        data = request.get_json()
+        photo_url = data.get('photo')
+        photo_path = None
+        if photo_url:
+            try:
+                response = requests.get(photo_url)
+                if response.status_code == 200:
+                    filename = secure_filename(os.path.basename(photo_url))
+                    static_dir = os.path.join('opinions_app', 'static')
+                    if not os.path.exists(static_dir):
+                        os.makedirs(static_dir)
+                    
+                    filepath = os.path.join(static_dir, filename)
+                    
+                    with open(filepath, 'wb') as f:
+                        f.write(response.content)
+                    photo_path = filename
+                else:
+                    return jsonify({'error': 'Не удалось загрузить изображение'}), 400
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
 
-        file = request.files['photo']
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-
-        if file:
-            filename = save_file(file)
-            new_coach = Coach(name=request.form['name'], photo=filename, description=request.form.get('description'))
-            db.session.add(new_coach)
-            db.session.commit()
-            return jsonify({'id': new_coach.id, 'name': new_coach.name}), 201
+        new_coach = Coach(name=data['name'], photo=photo_path, description=data.get('description'))
+        db.session.add(new_coach)
+        db.session.commit()
+        return jsonify({'id': new_coach.id, 'name': new_coach.name}), 201
 
 @app.route('/api/coaches/<int:id>', methods=['DELETE'])
 def delete_coach(id):

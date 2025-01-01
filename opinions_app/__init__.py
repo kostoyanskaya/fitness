@@ -10,9 +10,6 @@ db.init_app(app)
 migrate.init_app(app, db)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-app.config['UPLOAD_FOLDER'] = 'uploads/'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-
 
 from .models import User
 
@@ -21,4 +18,4 @@ from .models import User
 def load_user(user_id):
     return User.query.get(user_id)
 
-from . import api_views, cli_commands, error_handlers, views, admin
+from . import api_views, cli_commands, error_handlers, views, admin, schemas

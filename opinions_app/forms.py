@@ -37,8 +37,3 @@ class ExerciseTypeForm(Form):
     name = StringField('Name', validators=[DataRequired()])
 
 
-class PersonalTrainingForm(FlaskForm):
-    date = DateField('Дата', format='%Y-%m-%d', validators=[DataRequired()])
-    time = TimeField('Время', validators=[DataRequired()])
-    exercise_type_id = SelectField('Тип тренировки', choices=[(1, 'Персональная тренировка')], coerce=int, validators=[DataRequired()])
-    submit = SubmitField('Записаться')

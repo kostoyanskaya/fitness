@@ -10,7 +10,7 @@ import os
 import requests
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-
+from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, SubscriptionSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema
 
 bcrypt = Bcrypt(app)
 
@@ -24,19 +24,19 @@ def api_register():
 
     existing_user = User.query.filter_by(username=fullname).first()
     if existing_user:
-        return jsonify({'message': 'Username already exists!'}), 400
+        return jsonify({'message': 'Имя пользователя уже существует!'}), 400
     elif password == confirmpassword:
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user = User(username=fullname, email=email, password=hashed_password)
         db.session.add(user)
         try:
             db.session.commit()
-            return jsonify({'message': 'Your account has been created!'}), 201
+            return jsonify({'message': 'Ваш аккаунт был создан!'}), 201
         except Exception as e:
             db.session.rollback()
-            return jsonify({'message': 'An error occurred while creating your account.'}), 500
+            return jsonify({'message': 'Произошла ошибка при создании вашего аккаунта.'}), 500
     else:
-        return jsonify({'message': 'Passwords do not match!'}), 400
+        return jsonify({'message': 'Пароли не совпадают!'}), 400
 
 @app.route('/api/login', methods=['POST'])
 def api_login():
@@ -46,16 +46,18 @@ def api_login():
 
     user = User.query.filter_by(username=username).first()
     if user and bcrypt.check_password_hash(user.password, password):
-        login_user(user)  
-        return jsonify({'message': 'Login successful!', 'user': {'username': user.username, 'email': user.email}}), 200
+        login_user(user)
+        user_schema = UserSchema()
+        return jsonify({'message': 'Вход успешен!', 'user': user_schema.dump(user)}), 200
     else:
-        return jsonify({'message': 'Login Unsuccessful. Please check username and password!'}), 401
+        return jsonify({'message': 'Вход не удался. Пожалуйста, проверьте имя пользователя и пароль!'}), 401
 
-    
+
 @app.route('/api/users', methods=['GET'])
 def get_users():
     users = User.query.all()
-    users_list = [{'id': user.id, 'username': user.username, 'email': user.email} for user in users]
+    user_schema = UserSchema(many=True)
+    users_list = user_schema.dump(users)
     return jsonify(users_list), 200
 
 
@@ -69,7 +71,7 @@ def api_logout():
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     if not current_user.is_authenticated:
-        return jsonify({'message': 'Unauthorized'}), 401
+        return jsonify({'message': 'Нет доступа'}), 401
 
     user = User.query.get(user_id)
     if not user:
@@ -78,22 +80,26 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
 
-    return jsonify({'message': 'User deleted successfully'}), 200
+    return jsonify({'message': 'Пользователь успешно удален'}), 200
 
 
+    
 @app.route('/api/exercise_types', methods=['GET', 'POST'])
 def handle_exercise_types():
+    exercise_type_schema = ExerciseTypeSchema()
+
     if request.method == 'GET':
         exercise_types = ExerciseType.query.all()
-        exercise_types_list = [{'id': et.id, 'name': et.name} for et in exercise_types]
+        exercise_types_list = exercise_type_schema.dump(exercise_types, many=True)
         return jsonify(exercise_types_list), 200
     
     elif request.method == 'POST':
         data = request.get_json()
-        new_exercise_type = ExerciseType(name=data['name'])
-        db.session.add(new_exercise_type)
+        new_exercise_type = exercise_type_schema.load(data)
+        exercise_type = ExerciseType(**new_exercise_type)
+        db.session.add(exercise_type)
         db.session.commit()
-        return jsonify({'id': new_exercise_type.id, 'name': new_exercise_type.name}), 201
+        return exercise_type_schema.jsonify(exercise_type), 201
 
 @app.route('/api/exercise_types/<int:id>', methods=['DELETE'])
 def delete_exercise_type(id):
@@ -102,21 +108,24 @@ def delete_exercise_type(id):
         abort(404)
     db.session.delete(exercise_type)
     db.session.commit()
-    return jsonify({'message': 'Exercise type deleted successfully'}), 200
+    return jsonify({'message': 'Тип упражнения успешно удален'}), 200
 
 @app.route('/api/days_of_week', methods=['GET', 'POST'])
 def handle_days_of_week():
+    day_of_week_schema = DayOfWeekSchema()
+
     if request.method == 'GET':
         days_of_week = DayOfWeek.query.all()
-        days_list = [{'id': dow.id, 'name': dow.name} for dow in days_of_week]
+        days_list = day_of_week_schema.dump(days_of_week, many=True)
         return jsonify(days_list), 200
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_day_of_week = DayOfWeek(name=data['name'])
-        db.session.add(new_day_of_week)
+        new_day_of_week = day_of_week_schema.load(data)
+        day_of_week = DayOfWeek(**new_day_of_week)
+        db.session.add(day_of_week)
         db.session.commit()
-        return jsonify({'id': new_day_of_week.id, 'name': new_day_of_week.name}), 201
+        return jsonify(day_of_week_schema.dump(day_of_week)), 201 
 
 @app.route('/api/days_of_week/<int:id>', methods=['DELETE'])
 def delete_day_of_week(id):
@@ -125,19 +134,22 @@ def delete_day_of_week(id):
         abort(404)
     db.session.delete(day_of_week)
     db.session.commit()
-    return jsonify({'message': 'Day of week deleted successfully'}), 200
+    return jsonify({'message': 'День недели успешно удален'}), 200
 
 @app.route('/api/coaches', methods=['GET', 'POST'])
 def handle_coaches():
+    coach_schema = CoachSchema()
+
     if request.method == 'GET':
         coaches = Coach.query.all()
-        coaches_list = [{'id': coach.id, 'name': coach.name, 'photo': coach.photo, 'description': coach.description} for coach in coaches]
+        coaches_list = coach_schema.dump(coaches, many=True)
         return jsonify(coaches_list), 200
 
     elif request.method == 'POST':
         data = request.get_json()
         photo_url = data.get('photo')
         photo_path = None
+
         if photo_url:
             try:
                 response = requests.get(photo_url)
@@ -156,11 +168,12 @@ def handle_coaches():
                     return jsonify({'error': 'Не удалось загрузить изображение'}), 400
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
-
-        new_coach = Coach(name=data['name'], photo=photo_path, description=data.get('description'))
+        new_coach_data = coach_schema.load(data)
+        new_coach = Coach(name=new_coach_data['name'], description=new_coach_data.get('description'), photo=photo_path)
         db.session.add(new_coach)
         db.session.commit()
-        return jsonify({'id': new_coach.id, 'name': new_coach.name}), 201
+
+        return jsonify(coach_schema.dump(new_coach)), 201
 
 @app.route('/api/coaches/<int:id>', methods=['DELETE'])
 def delete_coach(id):
@@ -171,20 +184,20 @@ def delete_coach(id):
     db.session.commit()
     return jsonify({'message': 'Coach deleted successfully'}), 200
 
-
 @app.route('/api/subscriptions', methods=['GET', 'POST'])
 def handle_subscriptions():
+    subscription_schema = SubscriptionSchema()
+    
     if request.method == 'GET':
         subscriptions = Subscription.query.all()
-        subscriptions_list = [{'id': sub.id, 'name': sub.name, 'price': sub.price} for sub in subscriptions]
-        return jsonify(subscriptions_list), 200
+        return jsonify(subscription_schema.dump(subscriptions, many=True)), 200
 
     elif request.method == 'POST':
         data = request.get_json()
-        new_subscription = Subscription(name=data['name'], price=data['price'])
+        new_subscription = subscription_schema.load(data)
         db.session.add(new_subscription)
         db.session.commit()
-        return jsonify({'id': new_subscription.id, 'name': new_subscription.name, 'price': new_subscription.price}), 201
+        return subscription_schema.dump(new_subscription), 201
 
 @app.route('/api/subscriptions/<int:id>', methods=['DELETE'])
 def delete_subscription(id):
@@ -198,85 +211,56 @@ def delete_subscription(id):
 
 @app.route('/api/workouts', methods=['GET', 'POST'])
 def handle_workouts():
+    workout_schema = WorkoutSchema()
+    
     if request.method == 'GET':
         workouts = Workout.query.all()
-        workouts_list = [{
-            'id': workout.id,
-            'exercise_type_id': workout.exercise_type_id,
-            'day_of_week_id': workout.day_of_week_id,
-            'coach_id': workout.coach_id,
-            'date': workout.date.isoformat(),
-            'time': workout.time.isoformat()
-        } for workout in workouts]
-        return jsonify(workouts_list), 200
+        return jsonify(workout_schema.dump(workouts, many=True)), 200
 
     elif request.method == 'POST':
         data = request.get_json()
-        date_value = datetime.strptime(data['date'], '%Y-%m-%d').date()
-        time_value = datetime.strptime(data['time'], '%H:%M:%S').time()
-        new_workout = Workout(
-            exercise_type_id=data['exercise_type_id'],
-            day_of_week_id=data['day_of_week_id'],
-            coach_id=data['coach_id'],
-            date=date_value,
-            time=time_value
-        )
-
+        data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
+        data['time'] = datetime.strptime(data['time'], '%H:%M:%S').time()
+        new_workout = workout_schema.load(data)
         db.session.add(new_workout)
         db.session.commit()
-
-        return jsonify({
-            'id': new_workout.id,
-            'exercise_type_id': new_workout.exercise_type_id,
-            'day_of_week_id': new_workout.day_of_week_id,
-            'coach_id': new_workout.coach_id,
-            'date': new_workout.date.isoformat(),
-            'time': new_workout.time.isoformat()
-        }), 201
+        return workout_schema.dump(new_workout), 201
 
 
 @app.route('/api/bookings', methods=['POST'])
 def book_workouts():
+    booking_schema = BookingSchema()
     data = request.get_json()
-    user_id = data.get('user_id')
-    workout_id = data['workout_id']
+    new_booking = booking_schema.load(data)
 
-    new_booking = Booking(user_id=user_id, workout_id=workout_id)
     db.session.add(new_booking)
     db.session.commit()
-
-    return jsonify({
-        'message': 'Successfully booked workout.',
-        'booking_id': new_booking.id
-    }), 201
+    return jsonify({'message': 'Successfully booked workout.', 'booking_id': new_booking.id}), 201
 
 
 @app.route('/api/personal_trainings', methods=['POST'])
+@login_required
 def book_personal_training():
+    personal_training_schema = PersonalTrainingSchema()
     data = request.get_json()
-    user_id = current_user.id
-    print(user_id) 
-    coach_id = int(data.get('coach_id'))
-    date_str = data.get('date')
-    time_str = data.get('time')
+    
+    # Получение ID текущего пользователя
+    data['user_id'] = current_user.id
+    data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
+    data['time'] = datetime.strptime(data['time'], '%H:%M:%S').time()
 
-    date_value = datetime.strptime(date_str, '%Y-%m-%d').date()
-    time_value = datetime.strptime(time_str, '%H:%M').time()
-    day_of_week_id = (date_value.weekday() + 1) % 7 + 1
+    # Устанавливаем day_of_week_id на основе даты
+    data['day_of_week_id'] = (data['date'].weekday() + 1) % 7 + 1
 
-    coach = Coach.query.get(coach_id)
+    # Проверка наличия тренера
+    coach = Coach.query.get(data['coach_id'])
     if not coach or not coach.workouts:
         return jsonify({'error': 'Тренер не найден или у него нет доступных типов тренировок.'}), 404
 
-    new_training = PersonalTraining(
-        user_id=user_id,
-        coach_id=coach_id,
-        day_of_week_id=day_of_week_id,
-        date=date_value,
-        time=time_value
-    )
-    print(new_training)
+    # Теперь загружаем данные в схему после обработки
+    new_training = personal_training_schema.load(data)
 
+    # Сохранение в базе данных
     db.session.add(new_training)
     db.session.commit()
 
@@ -285,42 +269,29 @@ def book_personal_training():
         'personal_training_id': new_training.id
     }), 201
 
-
 @app.route('/api/user/trainings', methods=['GET'])
 def get_user_trainings():
     if current_user.is_authenticated:
         print(f"Текущий пользователь: {current_user.id}")
         bookings = Booking.query.filter_by(user_id=current_user.id).all()
-        workouts = []
 
+        workout_schema = WorkoutSchema(many=True)
+        workouts = []
         for booking in bookings:
             workout = Workout.query.get(booking.workout_id)
-            exercise_type = ExerciseType.query.get(workout.exercise_type_id)
-            coach = Coach.query.get(workout.coach_id)
-            workouts.append({
-                'id': workout.id,
-                'date': workout.date.strftime('%Y-%m-%d'),
-                'time': workout.time.strftime('%H:%M'),
-                'exercise': exercise_type.name if exercise_type else 'Unknown',
-                'coach': coach.name if coach else 'Unknown'
-            })
+            workouts.append(workout)
 
+        workouts_data = workout_schema.dump(workouts)
+
+        # Получаем все персональные тренировки пользователя
         personal_workouts = PersonalTraining.query.filter_by(user_id=current_user.id).all()
-        print(f"Персональные тренировки для пользователя {current_user.id}: {personal_workouts}")
-        personal_workouts_data = []
-        
-        for personal_workout in personal_workouts:
-            coach = Coach.query.get(personal_workout.coach_id)
-            personal_workouts_data.append({
-                'id': personal_workout.id,
-                'date': personal_workout.date.strftime('%Y-%m-%d'),
-                'time': personal_workout.time.strftime('%H:%M'),
-                'exercise': 'Персональная тренировка',
-                'coach': coach.name if coach else 'Unknown'
-            })
+
+        # Сериализуем персональные тренировки
+        personal_training_schema = PersonalTrainingSchema(many=True)
+        personal_workouts_data = personal_training_schema.dump(personal_workouts)
 
         return jsonify({
-            'workouts': workouts,
+            'workouts': workouts_data,
             'personal_workouts': personal_workouts_data
         }), 200
     else:

@@ -30,10 +30,11 @@
     } else {
         workouts.forEach(workout => {
             const row = `<tr>
-                <td>${workout.date}</td>
-                <td>${workout.time}</td>
-                <td>${workout.exercise}</td>
-                <td>${workout.coach}</td>
+                    <td>${workout.date}</td>
+                    <td>${workout.time}</td>
+                    <td>${workout.exercise_type_id}</td>
+                    <td>${workout.coach_id}</td>
+                    <td>
                 <td>
                     <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
                         <button type="submit" class="btn btn-danger">Отменить</button>
@@ -108,7 +109,7 @@
                     <tr>
                         <th>Дата</th>
                         <th>Время</th>
-                        <th>Упражнение</th>
+                        <th>Тип тренировки</th>
                         <th>Тренер</th>
                         <th>Запись</th>
                     </tr>
@@ -125,7 +126,7 @@
                     <tr>
                         <th>Дата</th>
                         <th>Время</th>
-                        <th>Упражнение</th>
+                        <th>Тип тренировки</th> <!-- Заголовок для типа тренировки -->
                         <th>Тренер</th>
                         <th>Запись</th>
                     </tr>

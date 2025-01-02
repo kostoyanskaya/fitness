@@ -77,6 +77,7 @@ class PersonalTraining(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     day_of_week_id = db.Column(db.Integer, db.ForeignKey('day_of_week.id'), nullable=False)
     coach_id = db.Column(db.Integer, db.ForeignKey('coach.id'), nullable=False)
+    workout_type = db.Column(db.String, default="Персональная тренировка")
 
     coach = db.relationship('Coach', backref='personal_trainings')
     day_of_week = db.relationship('DayOfWeek', backref='personal_trainings')

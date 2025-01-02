@@ -219,8 +219,6 @@ def handle_workouts():
 
     elif request.method == 'POST':
         data = request.get_json()
-        data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
-        data['time'] = datetime.strptime(data['time'], '%H:%M:%S').time()
         new_workout = workout_schema.load(data)
         db.session.add(new_workout)
         db.session.commit()
@@ -243,24 +241,14 @@ def book_workouts():
 def book_personal_training():
     personal_training_schema = PersonalTrainingSchema()
     data = request.get_json()
-    
-    # Получение ID текущего пользователя
     data['user_id'] = current_user.id
-    data['date'] = datetime.strptime(data['date'], '%Y-%m-%d').date()
-    data['time'] = datetime.strptime(data['time'], '%H:%M:%S').time()
+    data['workout_type'] = "Персональная тренировка"
 
-    # Устанавливаем day_of_week_id на основе даты
-    data['day_of_week_id'] = (data['date'].weekday() + 1) % 7 + 1
-
-    # Проверка наличия тренера
     coach = Coach.query.get(data['coach_id'])
     if not coach or not coach.workouts:
         return jsonify({'error': 'Тренер не найден или у него нет доступных типов тренировок.'}), 404
 
-    # Теперь загружаем данные в схему после обработки
     new_training = personal_training_schema.load(data)
-
-    # Сохранение в базе данных
     db.session.add(new_training)
     db.session.commit()
 
@@ -269,10 +257,10 @@ def book_personal_training():
         'personal_training_id': new_training.id
     }), 201
 
+
 @app.route('/api/user/trainings', methods=['GET'])
 def get_user_trainings():
     if current_user.is_authenticated:
-        print(f"Текущий пользователь: {current_user.id}")
         bookings = Booking.query.filter_by(user_id=current_user.id).all()
 
         workout_schema = WorkoutSchema(many=True)
@@ -283,10 +271,7 @@ def get_user_trainings():
 
         workouts_data = workout_schema.dump(workouts)
 
-        # Получаем все персональные тренировки пользователя
         personal_workouts = PersonalTraining.query.filter_by(user_id=current_user.id).all()
-
-        # Сериализуем персональные тренировки
         personal_training_schema = PersonalTrainingSchema(many=True)
         personal_workouts_data = personal_training_schema.dump(personal_workouts)
 

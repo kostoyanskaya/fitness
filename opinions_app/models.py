@@ -56,6 +56,7 @@ class Workout(db.Model):
     def __repr__(self):
         return f"<Workout {self.id}>"
 
+
 class Booking(db.Model):
     __tablename__ = 'booking'
     id = db.Column(db.Integer, primary_key=True)
@@ -63,7 +64,7 @@ class Booking(db.Model):
     workout_id = db.Column(db.Integer, db.ForeignKey('workout.id'), nullable=False)
     date_booked = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref=db.backref('bookings', passive_deletes=True))
+    user = db.relationship('User', backref=db.backref('bookings', cascade='all, delete-orphan'))
     workout = db.relationship('Workout', backref='bookings')
 
     def __repr__(self):
@@ -81,11 +82,11 @@ class PersonalTraining(db.Model):
 
     coach = db.relationship('Coach', backref='personal_trainings')
     day_of_week = db.relationship('DayOfWeek', backref='personal_trainings')
-    user = db.relationship('User', backref=db.backref('personal_trainings', passive_deletes=True))
+    user = db.relationship('User', backref=db.backref('personal_trainings', cascade='all, delete-orphan'))
 
     def __repr__(self):
         return f"<PersonalTraining('{self.date}', '{self.time}', 'User ID: {self.user_id}')>"
-    
+
 class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)

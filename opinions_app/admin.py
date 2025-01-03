@@ -8,6 +8,9 @@ from flask_admin.form import fields
 from wtforms import PasswordField
 from wtforms.validators import DataRequired
 from werkzeug.utils import secure_filename
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt(app)
 
 class UserModelView(ModelView):
     column_labels = {
@@ -20,6 +23,10 @@ class UserModelView(ModelView):
     column_exclude_list = ['password', 'Bookings', 'Personal Trainings']
     form_excluded_columns = ['Bookings', 'Personal Trainings']
     form_columns = ['username', 'email', 'password', 'date_added', 'telephone']
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            model.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
 class ExerciseTypeModelView(ModelView):
     column_labels = {

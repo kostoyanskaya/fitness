@@ -10,7 +10,7 @@ import os
 import requests
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, SubscriptionSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema
+from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, SubscriptionSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema, WorkoutSchemaForUsers
 
 bcrypt = Bcrypt(app)
 
@@ -82,8 +82,6 @@ def delete_user(user_id):
 
     return jsonify({'message': 'Пользователь успешно удален'}), 200
 
-
-    
 @app.route('/api/exercise_types', methods=['GET', 'POST'])
 def handle_exercise_types():
     exercise_type_schema = ExerciseTypeSchema()
@@ -99,7 +97,8 @@ def handle_exercise_types():
         exercise_type = ExerciseType(**new_exercise_type)
         db.session.add(exercise_type)
         db.session.commit()
-        return exercise_type_schema.jsonify(exercise_type), 201
+        response = exercise_type_schema.dump(exercise_type)
+        return jsonify(response), 201
 
 @app.route('/api/exercise_types/<int:id>', methods=['DELETE'])
 def delete_exercise_type(id):
@@ -214,8 +213,9 @@ def handle_workouts():
     workout_schema = WorkoutSchema()
     
     if request.method == 'GET':
+        workout_schema_get = WorkoutSchemaForUsers()
         workouts = Workout.query.all()
-        return jsonify(workout_schema.dump(workouts, many=True)), 200
+        return jsonify(workout_schema_get.dump(workouts, many=True)), 200
 
     elif request.method == 'POST':
         data = request.get_json()
@@ -223,7 +223,6 @@ def handle_workouts():
         db.session.add(new_workout)
         db.session.commit()
         return workout_schema.dump(new_workout), 201
-
 
 @app.route('/api/bookings', methods=['POST'])
 def book_workouts():
@@ -235,7 +234,6 @@ def book_workouts():
     db.session.commit()
     return jsonify({'message': 'Successfully booked workout.', 'booking_id': new_booking.id}), 201
 
-
 @app.route('/api/personal_trainings', methods=['POST'])
 @login_required
 def book_personal_training():
@@ -243,13 +241,11 @@ def book_personal_training():
     data = request.get_json()
     data['user_id'] = current_user.id
     data['workout_type'] = "Персональная тренировка"
-
     coach = Coach.query.get(data['coach_id'])
     if not coach or not coach.workouts:
         return jsonify({'error': 'Тренер не найден или у него нет доступных типов тренировок.'}), 404
-
     new_training = personal_training_schema.load(data)
-    db.session.add(new_training)
+    db.session.add(new_training)  
     db.session.commit()
 
     return jsonify({
@@ -257,13 +253,12 @@ def book_personal_training():
         'personal_training_id': new_training.id
     }), 201
 
-
 @app.route('/api/user/trainings', methods=['GET'])
 def get_user_trainings():
     if current_user.is_authenticated:
         bookings = Booking.query.filter_by(user_id=current_user.id).all()
 
-        workout_schema = WorkoutSchema(many=True)
+        workout_schema = WorkoutSchemaForUsers(many=True)
         workouts = []
         for booking in bookings:
             workout = Workout.query.get(booking.workout_id)

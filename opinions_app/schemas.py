@@ -37,6 +37,18 @@ class SubscriptionSchema(Schema):
 
 class WorkoutSchema(Schema):
     id = fields.Int(dump_only=True)
+    exercise_type_id = fields.Int(required=True)
+    day_of_week_id = fields.Int(required=True)
+    coach_id = fields.Int(required=True)
+    date = fields.Date(required=True)
+    time = fields.Time(required=True)
+
+    @post_load
+    def create_workout(self, data, **kwargs):
+        return Workout(**data)
+
+class WorkoutSchemaForUsers(Schema):
+    id = fields.Int(dump_only=True)
     exercise_type = fields.Str(attribute="exercise_type.name")
     day_of_week = fields.Str(attribute="day_of_week.name")
     coach = fields.Str(attribute="coach.name")
@@ -54,9 +66,10 @@ class BookingSchema(Schema):
     @post_load
     def create_booking(self, data, **kwargs):
         return Booking(**data)
-
+    
 class PersonalTrainingSchema(Schema):
-    coach_name = fields.String(required=True, attribute='coach.name')
+    coach_id = fields.Int(required=False)
+    coach_name = fields.String(required=False, attribute='coach.name')
     date = fields.Date(required=True)
     time = fields.Time(required=True)
     day_of_week_name = fields.String(required=False, attribute='day_of_week.name')
@@ -69,5 +82,4 @@ class PersonalTrainingSchema(Schema):
         if date_value:
             day_of_week = date_value.weekday()
             data['day_of_week_id'] = day_of_week + 1
-
         return PersonalTraining(**data)

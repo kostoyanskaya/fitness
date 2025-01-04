@@ -11,6 +11,13 @@ from werkzeug.utils import secure_filename
 
 bcrypt = Bcrypt(app)
 
+@app.route('/admin')
+@login_required
+def admin():
+    if not current_user.is_admin:
+        return "Вы не имеете доступа к этой странице", 403
+    return render_template('admin.html')
+
 
 @app.route('/register')
 def register():

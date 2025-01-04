@@ -9,6 +9,14 @@ from wtforms import PasswordField
 from wtforms.validators import DataRequired
 from werkzeug.utils import secure_filename
 from flask_bcrypt import Bcrypt
+from flask_admin.form.upload import FileUploadField
+from werkzeug.utils import secure_filename
+import os
+from flask_wtf.file import FileRequired
+from flask_wtf import FlaskForm
+from wtforms import StringField, TextAreaField
+from flask_wtf.file import FileField, FileRequired
+from flask_admin.contrib.sqla import ModelView
 
 bcrypt = Bcrypt(app)
 
@@ -44,7 +52,13 @@ class DayOfWeekModelView(ModelView):
     }
     form_columns = ['name']
 
+class CoachForm(FlaskForm):
+    name = StringField('Имя тренера')
+    description = TextAreaField('Описание')
+    photo = FileField('Фото тренера', validators=[FileRequired()])
+
 class CoachModelView(ModelView):
+    form = CoachForm
     column_labels = {
         'id': 'ID',
         'name': 'Имя тренера',
@@ -53,6 +67,18 @@ class CoachModelView(ModelView):
         'workouts': 'Тренировки'
     }
     form_columns = ['name', 'description', 'photo']
+
+    def _handle_file_upload(self, form, model):
+        if form.photo.data:
+            filename = secure_filename(form.photo.data.filename)
+            filepath = os.path.join('opinions_app', 'static', filename)
+            form.photo.data.save(filepath)
+            model.photo = filename
+
+    def on_model_change(self, form, model, is_created):
+        self._handle_file_upload(form, model)
+        super().on_model_change(form, model, is_created)
+
 
 
 class WorkoutModelView(ModelView):

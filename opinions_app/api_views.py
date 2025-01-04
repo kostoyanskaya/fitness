@@ -298,3 +298,14 @@ def cancel_personal_booking(personal_booking_id):
             return jsonify({'status': 'success', 'message': 'Персональная тренировка отменена.'}), 200
         return jsonify({'status': 'error', 'message': 'Персональная тренировка не найдена.'}), 404
     return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+
+@app.route('/create_admin', methods=['GET', 'POST'])
+def create_admin():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        new_admin = User(username=username, password=password, is_admin=True)
+        db.session.add(new_admin)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('create_admin.html')

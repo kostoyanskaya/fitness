@@ -39,7 +39,7 @@ class Coach(db.Model):
     name = db.Column(db.String(100), nullable=False)
     photo = db.Column(db.String(400), nullable=True)
     description = db.Column(db.Text, nullable=True)
-    workouts = db.relationship('Workout', backref='coach', lazy=True)
+    workouts = db.relationship('Workout', backref='coach', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"Coach('{self.name}')"
@@ -65,7 +65,7 @@ class Booking(db.Model):
     date_booked = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('bookings', cascade='all, delete-orphan'))
-    workout = db.relationship('Workout', backref='bookings')
+    workout = db.relationship('Workout', backref=db.backref('bookings', cascade='all, delete-orphan'))
 
     def __repr__(self):
         return f"Booking(user_id='{self.user_id}', workout_id='{self.workout_id}', date_booked='{self.date_booked}')"
@@ -76,12 +76,12 @@ class PersonalTraining(db.Model):
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.Time, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    day_of_week_id = db.Column(db.Integer, db.ForeignKey('day_of_week.id'), nullable=False)
-    coach_id = db.Column(db.Integer, db.ForeignKey('coach.id'), nullable=False)
+    day_of_week_id = db.Column(db.Integer, db.ForeignKey('day_of_week.id', ondelete='CASCADE'), nullable=False)
+    coach_id = db.Column(db.Integer, db.ForeignKey('coach.id', ondelete='CASCADE'), nullable=False)
     workout_type = db.Column(db.String, default="Персональная тренировка")
 
-    coach = db.relationship('Coach', backref='personal_trainings')
-    day_of_week = db.relationship('DayOfWeek', backref='personal_trainings')
+    coach = db.relationship('Coach', backref=db.backref('personaltrainings', cascade='all, delete-orphan'))
+    day_of_week = db.relationship('DayOfWeek', backref=db.backref('personaltrainings', cascade='all, delete-orphan'))
     user = db.relationship('User', backref=db.backref('personal_trainings', cascade='all, delete-orphan'))
 
     def __repr__(self):

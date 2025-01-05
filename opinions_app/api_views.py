@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from .models import db, User, ExerciseType, DayOfWeek, Coach, Subscription, Workout, Booking, PersonalTraining
 from opinions_app import app
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, LoginManager
 from flask_login import current_user
 from datetime import datetime
 import os
@@ -11,8 +11,29 @@ import requests
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, SubscriptionSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema, WorkoutSchemaForUsers
+from functools import wraps
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'register'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 bcrypt = Bcrypt(app)
+
+def role_required(role):
+    """Декоратор для ограничения доступа на основе ролей."""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return jsonify({"message": "User is not authenticated."}), 401
+            if not getattr(current_user, 'is_admin', False):
+                return jsonify({"message": "Access denied. You do not have permission to access this resource."}), 403
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 @app.route('/api/register', methods=['POST'])
 def api_register():
@@ -54,6 +75,7 @@ def api_login():
 
 
 @app.route('/api/users', methods=['GET'])
+@role_required('admin')
 def get_users():
     users = User.query.all()
     user_schema = UserSchema(many=True)
@@ -83,6 +105,7 @@ def delete_user(user_id):
     return jsonify({'message': 'Пользователь успешно удален'}), 200
 
 @app.route('/api/exercise_types', methods=['GET', 'POST'])
+@role_required('admin')
 def handle_exercise_types():
     exercise_type_schema = ExerciseTypeSchema()
 
@@ -101,6 +124,7 @@ def handle_exercise_types():
         return jsonify(response), 201
 
 @app.route('/api/exercise_types/<int:id>', methods=['DELETE'])
+@role_required('admin')
 def delete_exercise_type(id):
     exercise_type = ExerciseType.query.get(id)
     if not exercise_type:
@@ -110,6 +134,7 @@ def delete_exercise_type(id):
     return jsonify({'message': 'Тип упражнения успешно удален'}), 200
 
 @app.route('/api/days_of_week', methods=['GET', 'POST'])
+@role_required('admin')
 def handle_days_of_week():
     day_of_week_schema = DayOfWeekSchema()
 
@@ -127,6 +152,7 @@ def handle_days_of_week():
         return jsonify(day_of_week_schema.dump(day_of_week)), 201 
 
 @app.route('/api/days_of_week/<int:id>', methods=['DELETE'])
+@role_required('admin')
 def delete_day_of_week(id):
     day_of_week = DayOfWeek.query.get(id)
     if not day_of_week:
@@ -136,6 +162,7 @@ def delete_day_of_week(id):
     return jsonify({'message': 'День недели успешно удален'}), 200
 
 @app.route('/api/coaches', methods=['GET', 'POST'])
+@role_required('admin')
 def handle_coaches():
     coach_schema = CoachSchema()
 
@@ -175,6 +202,7 @@ def handle_coaches():
         return jsonify(coach_schema.dump(new_coach)), 201
 
 @app.route('/api/coaches/<int:id>', methods=['DELETE'])
+@role_required('admin')
 def delete_coach(id):
     coach = Coach.query.get(id)
     if not coach:
@@ -184,6 +212,7 @@ def delete_coach(id):
     return jsonify({'message': 'Coach deleted successfully'}), 200
 
 @app.route('/api/subscriptions', methods=['GET', 'POST'])
+@role_required('admin')
 def handle_subscriptions():
     subscription_schema = SubscriptionSchema()
     
@@ -199,6 +228,7 @@ def handle_subscriptions():
         return subscription_schema.dump(new_subscription), 201
 
 @app.route('/api/subscriptions/<int:id>', methods=['DELETE'])
+@role_required('admin')
 def delete_subscription(id):
     subscription = Subscription.query.get(id)
     if not subscription:
@@ -299,13 +329,28 @@ def cancel_personal_booking(personal_booking_id):
         return jsonify({'status': 'error', 'message': 'Персональная тренировка не найдена.'}), 404
     return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
 
-@app.route('/create_admin', methods=['GET', 'POST'])
+
+@app.route('/api/create_admin', methods=['POST'])
 def create_admin():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        new_admin = User(username=username, password=password, is_admin=True)
-        db.session.add(new_admin)
-        db.session.commit()
-        return redirect(url_for('login'))
-    return render_template('create_admin.html')
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    email = data.get('email')
+
+    if not username or not password or not email:
+        return jsonify({'message': 'Имя пользователя, пароль и адрес электронной почты обязательны!'}), 400
+
+    existing_user = User.query.filter_by(username=username).first()
+    if existing_user:
+        return jsonify({'message': 'Пользователь с таким именем уже существует!'}), 409
+
+    new_admin = User(
+        username=username,
+        email=email,
+        password=bcrypt.generate_password_hash(password).decode('utf-8'),
+        is_admin=True
+    )
+    db.session.add(new_admin)
+    db.session.commit()
+
+    return jsonify({'message': 'Администратор успешно создан!'}), 201

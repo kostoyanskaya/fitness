@@ -17,26 +17,47 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
 from flask_wtf.file import FileField, FileRequired
 from flask_admin.contrib.sqla import ModelView
+from flask_login import login_required, current_user
+from flask import  flash, redirect, render_template, url_for
+from flask.views import MethodView
+from functools import wraps
+from flask import abort
 
 bcrypt = Bcrypt(app)
 
-class UserModelView(ModelView):
+from functools import wraps
+from flask import abort
+
+
+class AdminModelView(ModelView):
+    def is_accessible(self):
+        # Проверяем, что пользователь аутентифицирован и является администратором
+        return current_user.is_authenticated and current_user.is_admin
+
+    def inaccessible_callback(self, name, **kwargs):
+        # Если пользователь не имеет доступа, перенаправляем его на главную страницу
+        return redirect(url_for('index_view'))
+
+
+class UserModelView(AdminModelView):
+
     column_labels = {
         'id': 'ID',
         'username': 'Имя пользователя',
         'email': 'Электронная почта',
         'date_added': 'Дата добавления',
-        'telephone': 'Телефон'
+        'telephone': 'Телефон',
+        'is_admin': 'Администратор'
     }
     column_exclude_list = ['password', 'Bookings', 'Personal Trainings']
     form_excluded_columns = ['Bookings', 'Personal Trainings']
-    form_columns = ['username', 'email', 'password', 'date_added', 'telephone']
+    form_columns = ['username', 'email', 'password', 'date_added', 'telephone', 'is_admin']
 
     def on_model_change(self, form, model, is_created):
         if is_created:
             model.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
-class ExerciseTypeModelView(ModelView):
+class ExerciseTypeModelView(AdminModelView):
     column_labels = {
         'id': 'ID',
         'name': 'Название упражнения',
@@ -44,7 +65,7 @@ class ExerciseTypeModelView(ModelView):
     }
     form_columns = ['name']
 
-class DayOfWeekModelView(ModelView):
+class DayOfWeekModelView(AdminModelView):
     column_labels = {
         'id': 'ID',
         'name': 'Название дня',
@@ -57,7 +78,7 @@ class CoachForm(FlaskForm):
     description = TextAreaField('Описание')
     photo = FileField('Фото тренера', validators=[FileRequired()])
 
-class CoachModelView(ModelView):
+class CoachModelView(AdminModelView):
     form = CoachForm
     column_labels = {
         'id': 'ID',
@@ -81,7 +102,7 @@ class CoachModelView(ModelView):
 
 
 
-class WorkoutModelView(ModelView):
+class WorkoutModelView(AdminModelView):
     column_labels = {
         'id': 'ID',
         'exercise_type_id': 'Тип упражнения',
@@ -91,7 +112,7 @@ class WorkoutModelView(ModelView):
         'time': 'Время'
     }
 
-class BookingModelView(ModelView):
+class BookingModelView(AdminModelView):
     column_labels = {
         'id': 'ID',
         'user_id': 'ID пользователя',
@@ -101,7 +122,7 @@ class BookingModelView(ModelView):
         'workout': 'Тренировка'
     }
 
-class PersonalTrainingModelView(ModelView):
+class PersonalTrainingModelView(AdminModelView):
     column_labels = {
         'id': 'ID',
         'date': 'Дата',
@@ -114,7 +135,7 @@ class PersonalTrainingModelView(ModelView):
         'user': 'Пользователь'
     }
 
-class SubscriptionModelView(ModelView):
+class SubscriptionModelView(AdminModelView):
     column_labels = {
         'id': 'ID',
         'name': 'Название подписки',
@@ -131,3 +152,4 @@ admin.add_view(WorkoutModelView(Workout, db.session, name='Тренировки'
 admin.add_view(BookingModelView(Booking, db.session, name='Записи'))
 admin.add_view(PersonalTrainingModelView(PersonalTraining, db.session, name='Персональные тренировки'))
 admin.add_view(SubscriptionModelView(Subscription, db.session, name='Подписки'))
+

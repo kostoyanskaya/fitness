@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(256), nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     telephone = db.Column(db.Integer)
+    is_admin = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"

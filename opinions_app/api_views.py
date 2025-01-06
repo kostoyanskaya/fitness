@@ -305,7 +305,9 @@ def get_user_trainings():
             'personal_workouts': personal_workouts_data
         }), 200
     else:
-        return jsonify({'error': 'Unauthorized'}), 401
+        return jsonify({
+        'error': 'Unauthorized'
+        }), 401
 
 @app.route('/api/bookings/<int:workout_id>', methods=['DELETE'])
 @login_required

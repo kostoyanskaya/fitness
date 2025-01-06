@@ -14,7 +14,7 @@
                 <img src="{{ url_for('static', filename=coach.photo) }}" alt="{{ coach.name }}" class="coach-photo">
                 <div class="coach-info">
                     <h2>{{ coach.name }}</h2>
-                    <p class="exercise-type">{{ coach.workouts[0].exercise_type.name if coach.workouts else 'Нет информации' }}</p>
+                    <p class="exercise-type">{{ coach.workouts[0].exercise_type.name if coach.workouts else 'Персональный тренер' }}</p>
                     <p class="description">{{ coach.description }}</p>
                 </div>
                 <div class="booking-form">

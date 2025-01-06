@@ -31,11 +31,9 @@ from flask import abort
 
 class AdminModelView(ModelView):
     def is_accessible(self):
-        # Проверяем, что пользователь аутентифицирован и является администратором
         return current_user.is_authenticated and current_user.is_admin
 
     def inaccessible_callback(self, name, **kwargs):
-        # Если пользователь не имеет доступа, перенаправляем его на главную страницу
         return redirect(url_for('index_view'))
 
 

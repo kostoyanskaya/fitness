@@ -8,7 +8,6 @@ class UserSchema(Schema):
     username = fields.Str() 
     email = fields.Str()
 
-
 class ExerciseTypeSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
@@ -68,6 +67,7 @@ class BookingSchema(Schema):
         return Booking(**data)
     
 class PersonalTrainingSchema(Schema):
+    id = fields.Int(dump_only=True)
     coach_id = fields.Int(required=False)
     coach_name = fields.String(required=False, attribute='coach.name')
     date = fields.Date(required=True)

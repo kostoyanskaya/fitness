@@ -12,28 +12,18 @@ from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, SubscriptionSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema, WorkoutSchemaForUsers
 from functools import wraps
+from .decorators import role_required
+from .validators import validate_registration_data
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'register'
+
+bcrypt = Bcrypt(app)
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-bcrypt = Bcrypt(app)
-
-def role_required(role):
-    """Декоратор для ограничения доступа на основе ролей."""
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if not current_user.is_authenticated:
-                return jsonify({"message": "User is not authenticated."}), 401
-            if not getattr(current_user, 'is_admin', False):
-                return jsonify({"message": "Access denied. You do not have permission to access this resource."}), 403
-            return f(*args, **kwargs)
-        return decorated_function
-    return decorator
 
 @app.route('/api/register', methods=['POST'])
 def api_register():
@@ -42,36 +32,29 @@ def api_register():
     email = data.get('email')
     password = data.get('password')
     confirmpassword = data.get('confirmpassword')
+    validation_error = validate_registration_data(
+        fullname, email, password, confirmpassword
+    )
+    if validation_error:
+        return validation_error
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    new_user = User(username=fullname, email=email, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
 
-    existing_user = User.query.filter_by(username=fullname).first()
-    if existing_user:
-        return jsonify({'message': 'Имя пользователя уже существует!'}), 400
-    elif password == confirmpassword:
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        user = User(username=fullname, email=email, password=hashed_password)
-        db.session.add(user)
-        try:
-            db.session.commit()
-            return jsonify({'message': 'Ваш аккаунт был создан!'}), 201
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'message': 'Произошла ошибка при создании вашего аккаунта.'}), 500
-    else:
-        return jsonify({'message': 'Пароли не совпадают!'}), 400
+    return jsonify('Ваш аккаунт был создан!'), 201
+
 
 @app.route('/api/login', methods=['POST'])
 def api_login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-
     user = User.query.filter_by(username=username).first()
     if user and bcrypt.check_password_hash(user.password, password):
         login_user(user)
-        user_schema = UserSchema()
-        return jsonify({'message': 'Вход успешен!', 'user': user_schema.dump(user)}), 200
-    else:
-        return jsonify({'message': 'Вход не удался. Пожалуйста, проверьте имя пользователя и пароль!'}), 401
+        return jsonify('Вход успешен!'), 200
+    return jsonify('Вход не удался. Пожалуйста, проверьте имя и пароль!'), 401
 
 
 @app.route('/api/users', methods=['GET'])
@@ -87,13 +70,13 @@ def get_users():
 @login_required
 def api_logout():
     logout_user()
-    return jsonify({'message': 'Logout successful!'}), 200
+    return jsonify('Выход выполнен успешно!'), 200
 
 
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     if not current_user.is_authenticated:
-        return jsonify({'message': 'Нет доступа'}), 401
+        return jsonify('Нет доступа'), 401
 
     user = User.query.get(user_id)
     if not user:
@@ -102,7 +85,7 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
 
-    return jsonify({'message': 'Пользователь успешно удален'}), 200
+    return jsonify('Пользователь успешно удален'), 200
 
 @app.route('/api/exercise_types', methods=['GET', 'POST'])
 @role_required('admin')

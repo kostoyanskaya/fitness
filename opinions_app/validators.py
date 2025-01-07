@@ -14,6 +14,8 @@ def validate_password(password):
 
 
 def validate_registration_data(fullname, email, password, confirmpassword):
+    if not fullname or not password or not email:
+        return 'Имя пользователя, пароль и адрес электронной почты обязательны!', 400
     if User.query.filter_by(username=fullname).first():
         return jsonify('Имя пользователя уже существует!'), 400
     if User.query.filter_by(email=email).first():

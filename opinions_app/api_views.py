@@ -20,6 +20,7 @@ login_manager.login_view = 'register'
 
 bcrypt = Bcrypt(app)
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -61,6 +62,8 @@ def api_login():
 @role_required('admin')
 def get_users():
     users = User.query.all()
+    if not users:
+        abort(404)
     user_schema = UserSchema(many=True)
     users_list = user_schema.dump(users)
     return jsonify(users_list), 200
@@ -74,18 +77,17 @@ def api_logout():
 
 
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
+@login_required
 def delete_user(user_id):
-    if not current_user.is_authenticated:
-        return jsonify('Нет доступа'), 401
-
     user = User.query.get(user_id)
     if not user:
         abort(404)
-
+    if current_user.id != user.id:
+        return jsonify('Нет доступа'), 403
     db.session.delete(user)
     db.session.commit()
-
     return jsonify('Пользователь успешно удален'), 200
+
 
 @app.route('/api/exercise_types', methods=['GET', 'POST'])
 @role_required('admin')
@@ -94,17 +96,18 @@ def handle_exercise_types():
 
     if request.method == 'GET':
         exercise_types = ExerciseType.query.all()
+        if not exercise_types:
+            abort(404)
         exercise_types_list = exercise_type_schema.dump(exercise_types, many=True)
         return jsonify(exercise_types_list), 200
     
-    elif request.method == 'POST':
-        data = request.get_json()
-        new_exercise_type = exercise_type_schema.load(data)
-        exercise_type = ExerciseType(**new_exercise_type)
-        db.session.add(exercise_type)
-        db.session.commit()
-        response = exercise_type_schema.dump(exercise_type)
-        return jsonify(response), 201
+    data = request.get_json()
+    new_exercise_type = exercise_type_schema.load(data)
+    exercise_type = ExerciseType(**new_exercise_type)
+    db.session.add(exercise_type)
+    db.session.commit()
+    response = exercise_type_schema.dump(exercise_type)
+    return jsonify(response), 201
 
 @app.route('/api/exercise_types/<int:id>', methods=['DELETE'])
 @role_required('admin')
@@ -114,7 +117,7 @@ def delete_exercise_type(id):
         abort(404)
     db.session.delete(exercise_type)
     db.session.commit()
-    return jsonify({'message': 'Тип упражнения успешно удален'}), 200
+    return jsonify('Тип упражнения успешно удален'), 200
 
 @app.route('/api/days_of_week', methods=['GET', 'POST'])
 @role_required('admin')
@@ -123,16 +126,17 @@ def handle_days_of_week():
 
     if request.method == 'GET':
         days_of_week = DayOfWeek.query.all()
+        if not days_of_week:
+            abort(404)
         days_list = day_of_week_schema.dump(days_of_week, many=True)
         return jsonify(days_list), 200
 
-    elif request.method == 'POST':
-        data = request.get_json()
-        new_day_of_week = day_of_week_schema.load(data)
-        day_of_week = DayOfWeek(**new_day_of_week)
-        db.session.add(day_of_week)
-        db.session.commit()
-        return jsonify(day_of_week_schema.dump(day_of_week)), 201 
+    data = request.get_json()
+    new_day_of_week = day_of_week_schema.load(data)
+    day_of_week = DayOfWeek(**new_day_of_week)
+    db.session.add(day_of_week)
+    db.session.commit()
+    return jsonify(day_of_week_schema.dump(day_of_week)), 201 
 
 @app.route('/api/days_of_week/<int:id>', methods=['DELETE'])
 @role_required('admin')
@@ -142,7 +146,7 @@ def delete_day_of_week(id):
         abort(404)
     db.session.delete(day_of_week)
     db.session.commit()
-    return jsonify({'message': 'День недели успешно удален'}), 200
+    return jsonify('День недели успешно удален'), 200
 
 @app.route('/api/coaches', methods=['GET', 'POST'])
 @role_required('admin')
@@ -160,23 +164,21 @@ def handle_coaches():
         photo_path = None
 
         if photo_url:
-            try:
-                response = requests.get(photo_url)
-                if response.status_code == 200:
-                    filename = secure_filename(os.path.basename(photo_url))
-                    static_dir = os.path.join('opinions_app', 'static')
-                    if not os.path.exists(static_dir):
-                        os.makedirs(static_dir)
-                    
-                    filepath = os.path.join(static_dir, filename)
-                    
-                    with open(filepath, 'wb') as f:
-                        f.write(response.content)
-                    photo_path = filename
-                else:
-                    return jsonify({'error': 'Не удалось загрузить изображение'}), 400
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
+            response = requests.get(photo_url)
+            if response.status_code == 200:
+                filename = secure_filename(os.path.basename(photo_url))
+                static_dir = os.path.join('opinions_app', 'static')
+                if not os.path.exists(static_dir):
+                    os.makedirs(static_dir)
+                
+                filepath = os.path.join(static_dir, filename)
+                
+                with open(filepath, 'wb') as f:
+                    f.write(response.content)
+                photo_path = filename
+            else:
+                return jsonify({'error': 'Не удалось загрузить изображение'}), 400
+
         new_coach_data = coach_schema.load(data)
         new_coach = Coach(name=new_coach_data['name'], description=new_coach_data.get('description'), photo=photo_path)
         db.session.add(new_coach)
@@ -192,7 +194,7 @@ def delete_coach(id):
         abort(404)
     db.session.delete(coach)
     db.session.commit()
-    return jsonify({'message': 'Coach deleted successfully'}), 200
+    return jsonify('Coach deleted successfully'), 200
 
 @app.route('/api/subscriptions', methods=['GET', 'POST'])
 @role_required('admin')
@@ -230,12 +232,11 @@ def handle_workouts():
         workouts = Workout.query.all()
         return jsonify(workout_schema_get.dump(workouts, many=True)), 200
 
-    elif request.method == 'POST':
-        data = request.get_json()
-        new_workout = workout_schema.load(data)
-        db.session.add(new_workout)
-        db.session.commit()
-        return workout_schema.dump(new_workout), 201
+    data = request.get_json()
+    new_workout = workout_schema.load(data)
+    db.session.add(new_workout)
+    db.session.commit()
+    return workout_schema.dump(new_workout), 201
 
 @app.route('/api/bookings', methods=['POST'])
 def book_workouts():
@@ -318,24 +319,21 @@ def cancel_personal_booking(personal_booking_id):
 @app.route('/api/create_admin', methods=['POST'])
 def create_admin():
     data = request.get_json()
-    username = data.get('username')
+    fullname = data.get('username')
     password = data.get('password')
     email = data.get('email')
-
-    if not username or not password or not email:
-        return jsonify({'message': 'Имя пользователя, пароль и адрес электронной почты обязательны!'}), 400
-
-    existing_user = User.query.filter_by(username=username).first()
-    if existing_user:
-        return jsonify({'message': 'Пользователь с таким именем уже существует!'}), 409
-
+    confirmpassword = data.get('confirmpassword')
+    validation_error = validate_registration_data(
+        fullname, email, password, confirmpassword
+    )
+    if validation_error:
+        return validation_error
     new_admin = User(
-        username=username,
+        username=fullname,
         email=email,
         password=bcrypt.generate_password_hash(password).decode('utf-8'),
         is_admin=True
     )
     db.session.add(new_admin)
     db.session.commit()
-
-    return jsonify({'message': 'Администратор успешно создан!'}), 201
+    return jsonify('Администратор успешно создан!'), 201

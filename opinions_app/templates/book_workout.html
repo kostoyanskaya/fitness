@@ -6,30 +6,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylebook.css') }}"> 
     <title>Запись на тренировки</title>
-        <script>
+    <script>
         async function bookWorkout(workoutId) {
-       const userId = {{ current_user.id }};
-       try {
-           const response = await fetch('/api/bookings', {
-               method: 'POST',
-               headers: {
-                   'Content-Type': 'application/json'
-               },
-               body: JSON.stringify({ user_id: userId, workout_id: workoutId })
-           });
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: 1, // Замените на реальный ID пользователя
+                        workout_id: workoutId
+                    })
+                });
 
-           if (!response.ok) {
-               const errorData = await response.json();
-               throw new Error(errorData.message || 'Ошибка записи на тренировку');
-           }
+                if (!response.ok) {
+                    throw new Error('Не удалось записаться на тренировку');
+                }
 
-           const data = await response.json();
-           alert(data.message);
-       } catch (error) {
-           alert('Ошибка: ' + error.message);
-       }
-   }
-        </script>
+                const result = await response.json();
+                alert(result);
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        }
+        async function fetchWorkouts() {
+            try {
+                const response = await fetch('/api/workouts');
+                if (!response.ok) {
+                    throw new Error('Не удалось загрузить тренировки');
+                }
+                const workouts = await response.json();
+                populateWorkoutTable(workouts);
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        }
+
+        function populateWorkoutTable(workouts) {
+            const tableBody = document.querySelector('#workoutTableBody');
+            tableBody.innerHTML = '';
+            workouts.forEach(workout => {
+                const row = document.createElement('tr');
+                const date = new Date(workout.date).toISOString().split('T')[0];
+                const time = workout.time;
+
+                row.innerHTML = `
+                    <td>${workout.day_of_week}</td> <!-- Используем уже сериализованное значение -->
+                    <td>${date}</td>
+                    <td>${time}</td>
+                    <td>${workout.exercise_type}</td> <!-- Используем уже сериализованное значение -->
+                    <td>${workout.coach}</td> <!-- Используем уже сериализованное значение -->
+                    <td>
+                        <button onclick="bookWorkout(${workout.id})" class="btn btn-primary">Записаться</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchWorkouts);
+    </script>
 </head>
 <body>
     <div class="background-image"></div>
@@ -49,19 +86,7 @@
                             <th>Записаться</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for workout in workouts %}
-                        <tr>
-                            <td>{{ workout.day_of_week.name }}</td>
-                            <td>{{ workout.date.strftime('%Y-%m-%d') }}</td>
-                            <td>{{ workout.time.strftime('%H:%M:%S') }}</td>
-                            <td>{{ workout.exercise_type.name }}</td>
-                            <td>{{ workout.coach.name }}</td>
-                            <td>
-                                <button onclick="bookWorkout({{ workout.id }})" class="btn btn-primary">Записаться</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                    <tbody id="workoutTableBody">
                     </tbody>
                 </table>
             </div>

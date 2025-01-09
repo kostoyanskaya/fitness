@@ -6,25 +6,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ценообразование</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='cost.css') }}">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/prices')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Сеть не в порядке');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const pricesContainer = document.querySelector('.nesolestag-enadenud');
+                data.forEach(val => {
+                    const priceDiv = document.createElement('div');
+                    priceDiv.className = 'ico-wrap';
+
+                    // Добавление иконки
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = 'circle'; // Подключение того же класса для иконки
+                    priceDiv.appendChild(iconDiv);
+
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'meanous-andscoev';
+                    detailsDiv.innerHTML = `
+                        <h4 class="aio-icon-title">${val.name}</h4>
+                        <div class="aio-icon-description">
+                            Цена: ${val.price} рублей
+                        </div>
+                    `;
+
+                    const kesednsoledSpan = document.createElement('span');
+                    kesednsoledSpan.className = 'kesednsoled';
+
+                    // Добавление структуры
+                    pricesContainer.appendChild(priceDiv);
+                    pricesContainer.appendChild(detailsDiv);
+                    pricesContainer.appendChild(kesednsoledSpan);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+        });
+    </script>
 </head>
 <body>
 
 <div class="contacts-container">
     <div class="nesolestag-enadenud">
         <h3 style="text-align:center;">Стоимость услуг</h3>
-
-        {% for subscription in subscriptions %}
-        <div class="ico-wrap">
-            <div class="circle"></div>
-        </div>
-        <div class="meanous-andscoev">
-            <h4 class="aio-icon-title">{{ subscription.name }}</h4>
-            <div class="aio-icon-description">
-                Цена: {{ subscription.price }} рублей
-            </div>
-        </div>
-        <span class="kesednsoled"></span>
-        {% endfor %}
+        <!-- Цены будут добавлены сюда через JavaScript -->
     </div>
 </div>
 

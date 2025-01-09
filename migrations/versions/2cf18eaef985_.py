@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3e0460b15fb8
+Revision ID: 2cf18eaef985
 Revises: 
-Create Date: 2025-01-04 13:28:09.936616
+Create Date: 2025-01-09 13:49:29.517160
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3e0460b15fb8'
+revision = '2cf18eaef985'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -37,7 +37,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
-    op.create_table('subscription',
+    op.create_table('price',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
@@ -50,6 +50,7 @@ def upgrade():
     sa.Column('password', sa.String(length=256), nullable=False),
     sa.Column('date_added', sa.DateTime(), nullable=True),
     sa.Column('telephone', sa.Integer(), nullable=True),
+    sa.Column('is_admin', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
@@ -97,7 +98,7 @@ def downgrade():
     op.drop_table('workout')
     op.drop_table('personal_training')
     op.drop_table('user')
-    op.drop_table('subscription')
+    op.drop_table('price')
     op.drop_table('exercise_type')
     op.drop_table('day_of_week')
     op.drop_table('coach')

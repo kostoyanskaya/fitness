@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template, flash, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from .models import db, User, ExerciseType, DayOfWeek, Coach, Subscription, Workout, Booking, PersonalTraining
+from .models import db, User, ExerciseType, DayOfWeek, Coach, Price, Workout, Booking, PersonalTraining
 from opinions_app import app
 from flask_login import login_user, logout_user, login_required, LoginManager
 from flask_login import current_user
@@ -10,7 +10,7 @@ import os
 import requests
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, SubscriptionSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema, WorkoutSchemaForUsers
+from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema, WorkoutSchemaForUsers, PriceSchema
 from functools import wraps
 from .decorators import role_required
 from .validators import validate_registration_data
@@ -152,39 +152,35 @@ def delete_day_of_week(id):
 @role_required('admin')
 def handle_coaches():
     coach_schema = CoachSchema()
-
     if request.method == 'GET':
         coaches = Coach.query.all()
         coaches_list = coach_schema.dump(coaches, many=True)
         return jsonify(coaches_list), 200
-
-    elif request.method == 'POST':
-        data = request.get_json()
-        photo_url = data.get('photo')
-        photo_path = None
-
-        if photo_url:
+    data = request.get_json()
+    photo_url = data.get('photo')
+    photo_path = None
+    if photo_url:
+        try:
             response = requests.get(photo_url)
             if response.status_code == 200:
                 filename = secure_filename(os.path.basename(photo_url))
                 static_dir = os.path.join('opinions_app', 'static')
                 if not os.path.exists(static_dir):
                     os.makedirs(static_dir)
-                
                 filepath = os.path.join(static_dir, filename)
-                
                 with open(filepath, 'wb') as f:
                     f.write(response.content)
                 photo_path = filename
-            else:
-                return jsonify({'error': 'Не удалось загрузить изображение'}), 400
+        except requests.exceptions.RequestException:
+            return jsonify('Не удалось загрузить изображение'), 400
+    new_coach_data = coach_schema.load(data)
+    new_coach = Coach(
+        name=new_coach_data['name'], description=new_coach_data.get('description'), photo=photo_path
+    )
+    db.session.add(new_coach)
+    db.session.commit()
 
-        new_coach_data = coach_schema.load(data)
-        new_coach = Coach(name=new_coach_data['name'], description=new_coach_data.get('description'), photo=photo_path)
-        db.session.add(new_coach)
-        db.session.commit()
-
-        return jsonify(coach_schema.dump(new_coach)), 201
+    return jsonify(coach_schema.dump(new_coach)), 201
 
 @app.route('/api/coaches/<int:id>', methods=['DELETE'])
 @role_required('admin')
@@ -194,33 +190,36 @@ def delete_coach(id):
         abort(404)
     db.session.delete(coach)
     db.session.commit()
-    return jsonify('Coach deleted successfully'), 200
+    return jsonify('Тренер удален успешно'), 200
 
-@app.route('/api/subscriptions', methods=['GET', 'POST'])
-@role_required('admin')
-def handle_subscriptions():
-    subscription_schema = SubscriptionSchema()
-    
+@app.route('/api/prices', methods=['GET', 'POST'])
+def handle_prices():
+    price_schema = PriceSchema()
+
     if request.method == 'GET':
-        subscriptions = Subscription.query.all()
-        return jsonify(subscription_schema.dump(subscriptions, many=True)), 200
+        prices = Price.query.all()
+        if not prices:
+            abort(404, description='Цены не найдены')
 
-    elif request.method == 'POST':
+        return jsonify(price_schema.dump(prices, many=True)), 200
+
+    @role_required('admin')
+    def create_price():
         data = request.get_json()
-        new_subscription = subscription_schema.load(data)
-        db.session.add(new_subscription)
+        new_price = price_schema.load(data)
+        db.session.add(new_price)
         db.session.commit()
-        return subscription_schema.dump(new_subscription), 201
+        return price_schema.dump(new_price), 201
 
-@app.route('/api/subscriptions/<int:id>', methods=['DELETE'])
+@app.route('/api/prices/<int:id>', methods=['DELETE'])
 @role_required('admin')
-def delete_subscription(id):
-    subscription = Subscription.query.get(id)
-    if not subscription:
-        abort(404)
-    db.session.delete(subscription)
+def delete_price(id):
+    price = Price.query.get(id)
+    if not price:
+        abort(404, description='Цена не найдена')
+    db.session.delete(price)
     db.session.commit()
-    return jsonify({'message': 'Subscription deleted successfully'}), 200
+    return jsonify('Цена успешно удалена'), 200
 
 
 @app.route('/api/workouts', methods=['GET', 'POST'])
@@ -230,6 +229,8 @@ def handle_workouts():
     if request.method == 'GET':
         workout_schema_get = WorkoutSchemaForUsers()
         workouts = Workout.query.all()
+        if not workouts:
+            abort(404, description='Цена не найдена')
         return jsonify(workout_schema_get.dump(workouts, many=True)), 200
 
     data = request.get_json()
@@ -243,10 +244,9 @@ def book_workouts():
     booking_schema = BookingSchema()
     data = request.get_json()
     new_booking = booking_schema.load(data)
-
     db.session.add(new_booking)
     db.session.commit()
-    return jsonify({'message': 'Successfully booked workout.', 'booking_id': new_booking.id}), 201
+    return jsonify('Успешно записаны на тренировку.'), 201
 
 @app.route('/api/personal_trainings', methods=['POST'])
 @login_required
@@ -256,64 +256,55 @@ def book_personal_training():
     data['user_id'] = current_user.id
     data['workout_type'] = "Персональная тренировка"
     coach = Coach.query.get(data['coach_id'])
-    if not coach or not coach.workouts:
-        return jsonify({'error': 'Тренер не найден или у него нет доступных типов тренировок.'}), 404
+    if not coach:
+        return jsonify('Тренер не найден или у него нет доступных типов тренировок.'), 404
     new_training = personal_training_schema.load(data)
     db.session.add(new_training)  
     db.session.commit()
-
-    return jsonify({
-        'message': 'Успешно записано на персональную тренировку.',
-        'personal_training_id': new_training.id
-    }), 201
+    return jsonify('Успешно записано на персональную тренировку.'), 201
 
 @app.route('/api/user/trainings', methods=['GET'])
 def get_user_trainings():
     if current_user.is_authenticated:
         bookings = Booking.query.filter_by(user_id=current_user.id).all()
-
         workout_schema = WorkoutSchemaForUsers(many=True)
         workouts = []
         for booking in bookings:
             workout = Workout.query.get(booking.workout_id)
             workouts.append(workout)
-
         workouts_data = workout_schema.dump(workouts)
-
         personal_workouts = PersonalTraining.query.filter_by(user_id=current_user.id).all()
         personal_training_schema = PersonalTrainingSchema(many=True)
         personal_workouts_data = personal_training_schema.dump(personal_workouts)
-
         return jsonify({
             'workouts': workouts_data,
             'personal_workouts': personal_workouts_data
         }), 200
-    else:
-        return jsonify({
-        'error': 'Unauthorized'
-        }), 401
+    return jsonify('Нет доступа'), 401
 
 @app.route('/api/bookings/<int:workout_id>', methods=['DELETE'])
 @login_required
 def cancel_booking(workout_id):
     booking = Booking.query.filter_by(workout_id=workout_id, user_id=current_user.id).first()
     if not booking:
-        return jsonify({'message': 'Booking not found.'}), 404
+        return jsonify('Тренировка не найдена.')
     db.session.delete(booking)
     db.session.commit()
 
-    return jsonify({'message': 'Booking cancelled successfully.', 'status': 'success'}), 200
+    return jsonify('Тренировка отменена.'), 200
 
 @app.route('/api/cancel_personal_booking/<int:personal_booking_id>', methods=['DELETE'])
 def cancel_personal_booking(personal_booking_id):
     if current_user.is_authenticated:
-        personal_booking = PersonalTraining.query.filter_by(id=personal_booking_id, user_id=current_user.id).first()
+        personal_booking = PersonalTraining.query.filter_by(
+            id=personal_booking_id, user_id=current_user.id
+        ).first()
         if personal_booking:
             db.session.delete(personal_booking)
             db.session.commit()
-            return jsonify({'status': 'success', 'message': 'Персональная тренировка отменена.'}), 200
-        return jsonify({'status': 'error', 'message': 'Персональная тренировка не найдена.'}), 404
-    return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+            return jsonify('Персональная тренировка отменена.'), 200
+        return jsonify('Персональная тренировка не найдена.'), 404
+    return jsonify('Нет доступа'), 401
 
 
 @app.route('/api/create_admin', methods=['POST'])

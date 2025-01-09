@@ -3,7 +3,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from settings import Config
 from opinions_app import app
-from .models import db, User, ExerciseType, DayOfWeek, Coach, Workout, Booking, PersonalTraining, Subscription
+from .models import db, User, ExerciseType, DayOfWeek, Coach, Workout, Booking, PersonalTraining, Price
 from flask_admin.form import fields
 from wtforms import PasswordField
 from wtforms.validators import DataRequired
@@ -133,7 +133,7 @@ class PersonalTrainingModelView(AdminModelView):
         'user': 'Пользователь'
     }
 
-class SubscriptionModelView(AdminModelView):
+class PriceModelView(AdminModelView):
     column_labels = {
         'id': 'ID',
         'name': 'Название подписки',
@@ -149,5 +149,5 @@ admin.add_view(CoachModelView(Coach, db.session, name='Тренеры'))
 admin.add_view(WorkoutModelView(Workout, db.session, name='Тренировки'))
 admin.add_view(BookingModelView(Booking, db.session, name='Записи'))
 admin.add_view(PersonalTrainingModelView(PersonalTraining, db.session, name='Персональные тренировки'))
-admin.add_view(SubscriptionModelView(Subscription, db.session, name='Подписки'))
+admin.add_view(PriceModelView(Price, db.session, name='Цена'))
 

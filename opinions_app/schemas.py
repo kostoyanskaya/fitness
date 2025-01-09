@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, post_load
-from .models import Subscription, Workout, Booking, PersonalTraining
+from .models import Price, Workout, Booking, PersonalTraining
 from datetime import time
 
 
@@ -25,14 +25,14 @@ class CoachSchema(Schema):
     description = fields.Str(allow_none=True)
 
 
-class SubscriptionSchema(Schema):
+class PriceSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     price = fields.Float(required=True)
 
     @post_load
-    def create_subscription(self, data, **kwargs):
-        return Subscription(**data)
+    def create_price(self, data, **kwargs):
+        return Price(**data)
 
 class WorkoutSchema(Schema):
     id = fields.Int(dump_only=True)

@@ -88,11 +88,11 @@ class PersonalTraining(db.Model):
     def __repr__(self):
         return f"<PersonalTraining('{self.date}', '{self.time}', 'User ID: {self.user_id}')>"
 
-class Subscription(db.Model):
+class Price(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return f'<Subscription {self.name}>'
+        return f'<Price {self.name}>'
 

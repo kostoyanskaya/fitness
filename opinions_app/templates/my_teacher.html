@@ -8,72 +8,89 @@
 <body>
     <div class="coaches-container">
         <h1>Наши Тренеры</h1>
-        <div class="coaches-list">
-            {% for coach in coaches %}
-            <div class="coach-card">
-                <img src="{{ url_for('static', filename=coach.photo) }}" alt="{{ coach.name }}" class="coach-photo">
-                <div class="coach-info">
-                    <h2>{{ coach.name }}</h2>
-                    <p class="exercise-type">{{ coach.workouts[0].exercise_type.name if coach.workouts else 'Персональный тренер' }}</p>
-                    <p class="description">{{ coach.description }}</p>
-                </div>
-                <div class="booking-form">
-                    <form id="booking-form" onsubmit="return bookPersonalTraining(event)">
-                        <input type="hidden" name="coach_id" value="{{ coach.id }}">
-                        <table>
-                            <tr>
-                                <td><label for="date">Дата:</label></td>
-                                <td><input type="date" id="date" name="date" required></td>
-                            </tr>
-                            <tr>
-                                <td><label for="time">Время:</label></td>
-                                <td><input type="time" id="time" name="time" required></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <button type="submit">Записаться на тренировку</button>
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
+        <div class="coaches-list" id="coachesList">
         </div>
     </div>
+
     <script>
-        async function bookPersonalTraining(event) {
-    event.preventDefault();
+        const staticUrl = "{{ static_url }}";
 
-    const form = event.target;
-    const formData = new FormData(form);
-
-    const data = {
-        coach_id: formData.get('coach_id'),
-        date: formData.get('date'),
-        time: formData.get('time')
-    };
-
-    try {
-        const response = await fetch('/api/personal_trainings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            throw new Error('Ошибка при бронировании тренировки');
+        async function fetchCoaches() {
+            try {
+                const response = await fetch('/api/coaches');
+                if (!response.ok) {
+                    throw new Error('Не удалось загрузить тренеров');
+                }
+                const coaches = await response.json();
+                populateCoachesList(coaches);
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
         }
 
-        const result = await response.json();
-        alert(result.message);
-        form.reset();
-    } catch (error) {
-        alert(error.message);
-    }
-}
+        function populateCoachesList(coaches) {
+            const coachesList = document.getElementById('coachesList');
+            coachesList.innerHTML = '';
+            coaches.forEach(coach => {
+                const coachCard = document.createElement('div');
+                coachCard.className = 'coach-card';
+                
+                // Determine the workout type or default to "Персональный тренер"
+                const workoutType = (coach.workouts && coach.workouts.length > 0) 
+                    ? coach.workouts[0].exercise_type.name 
+                    : 'Персональный тренер';
+
+                coachCard.innerHTML = `
+                    <img src="${coach.photo ? staticUrl + coach.photo : ''}" alt="${coach.name}" class="coach-photo">
+                    <h2 class="coach-name">${coach.name}</h2>
+                    <p class="coach-workout-type">${workoutType}</p> <!-- Display workout type here -->
+                    <p class="coach-description">${coach.description || 'Описание отсутствует'}</p>
+                    <form class="booking-form" onsubmit="bookPersonalTraining(event)">
+                        <input type="hidden" name="coach_id" value="${coach.id}">
+                        <label for="date">Дата:</label>
+                        <input type="date" name="date" required>
+                        <label for="time">Время:</label>
+                        <input type="time" name="time" required>
+                        <button type="submit">Записаться</button>
+                    </form>
+                `;
+                coachesList.appendChild(coachCard);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', fetchCoaches);
+
+        async function bookPersonalTraining(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = {
+                coach_id: formData.get('coach_id'),
+                date: formData.get('date'),
+                time: formData.get('time')
+            };
+
+            try {
+                const response = await fetch('/api/personal_trainings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при бронировании тренировки');
+                }
+
+                const result = await response.json();
+                alert(result.message);
+                form.reset();
+            } catch (error) {
+                alert(error.message);
+            }
+        }
     </script>
 </body>
 {% endblock %}

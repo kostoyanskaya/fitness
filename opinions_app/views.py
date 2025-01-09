@@ -5,7 +5,7 @@ from opinions_app import app, db
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from .forms import RegistrationForm, LoginForm, WorkoutForm, BookingForm
-from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, Subscription
+from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, Price
 from werkzeug.utils import secure_filename
 
 
@@ -31,15 +31,14 @@ def me_view():
 
 @app.route('/booking')
 def book_workout():
-    workouts = Workout.query.all()
-    return render_template('book_workout.html', workouts=workouts)
+    return render_template('book_workout.html')
 
 
 @app.route('/teacher')
 def teacher_view():
-    """Тренер страница."""
-    coaches = Coach.query.all()
-    return render_template('my_teacher.html', coaches=coaches)
+    return render_template(
+        'my_teacher.html', static_url=url_for('static', filename='')
+    )
 
 @app.route('/contacts')
 def information_view():
@@ -49,6 +48,5 @@ def information_view():
 @app.route('/price')
 def price_view():
     """Ценообразование."""
-    subscriptions = Subscription.query.all()
-    return render_template('cost.html', subscriptions=subscriptions)
+    return render_template('cost.html')
 

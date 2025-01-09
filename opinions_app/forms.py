@@ -18,6 +18,8 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
+    
+
 
 class WorkoutForm(FlaskForm):
     exercise_type = SelectField('Тип упражнения', coerce=int, validators=[DataRequired()])

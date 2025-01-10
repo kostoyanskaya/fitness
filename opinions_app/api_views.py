@@ -12,7 +12,7 @@ from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema, WorkoutSchemaForUsers, PriceSchema
 from functools import wraps
-from .decorators import role_required
+from .decorators import role_required, role_required_for_methods
 from .validators import validate_registration_data
 
 login_manager = LoginManager(app)
@@ -90,7 +90,7 @@ def delete_user(user_id):
 
 
 @app.route('/api/exercise_types', methods=['GET', 'POST'])
-@role_required('admin')
+@role_required_for_methods()
 def handle_exercise_types():
     exercise_type_schema = ExerciseTypeSchema()
 
@@ -120,7 +120,7 @@ def delete_exercise_type(id):
     return jsonify('Тип упражнения успешно удален'), 200
 
 @app.route('/api/days_of_week', methods=['GET', 'POST'])
-@role_required('admin')
+@role_required_for_methods()
 def handle_days_of_week():
     day_of_week_schema = DayOfWeekSchema()
 
@@ -149,7 +149,7 @@ def delete_day_of_week(id):
     return jsonify('День недели успешно удален'), 200
 
 @app.route('/api/coaches', methods=['GET', 'POST'])
-@role_required('admin')
+@role_required_for_methods()
 def handle_coaches():
     coach_schema = CoachSchema()
     if request.method == 'GET':
@@ -193,6 +193,7 @@ def delete_coach(id):
     return jsonify('Тренер удален успешно'), 200
 
 @app.route('/api/prices', methods=['GET', 'POST'])
+@role_required_for_methods()
 def handle_prices():
     price_schema = PriceSchema()
 
@@ -200,16 +201,13 @@ def handle_prices():
         prices = Price.query.all()
         if not prices:
             abort(404, description='Цены не найдены')
-
         return jsonify(price_schema.dump(prices, many=True)), 200
 
-    @role_required('admin')
-    def create_price():
-        data = request.get_json()
-        new_price = price_schema.load(data)
-        db.session.add(new_price)
-        db.session.commit()
-        return price_schema.dump(new_price), 201
+    data = request.get_json()
+    new_price = price_schema.load(data)
+    db.session.add(new_price)
+    db.session.commit()
+    return price_schema.dump(new_price), 201
 
 @app.route('/api/prices/<int:id>', methods=['DELETE'])
 @role_required('admin')
@@ -223,6 +221,7 @@ def delete_price(id):
 
 
 @app.route('/api/workouts', methods=['GET', 'POST'])
+@role_required_for_methods()
 def handle_workouts():
     workout_schema = WorkoutSchema()
     

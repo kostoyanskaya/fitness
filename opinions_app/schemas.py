@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields, post_load, post_dump
 from .models import Price, Workout, Booking, PersonalTraining
 from datetime import time
 
@@ -17,23 +17,6 @@ class DayOfWeekSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
 
-
-class CoachSchema(Schema):
-    id = fields.Int(dump_only=True)
-    name = fields.Str(required=True)
-    photo = fields.Str(allow_none=True)
-    description = fields.Str(allow_none=True)
-
-
-class PriceSchema(Schema):
-    id = fields.Int(dump_only=True)
-    name = fields.Str(required=True)
-    price = fields.Float(required=True)
-
-    @post_load
-    def create_price(self, data, **kwargs):
-        return Price(**data)
-
 class WorkoutSchema(Schema):
     id = fields.Int(dump_only=True)
     exercise_type_id = fields.Int(required=True)
@@ -45,6 +28,44 @@ class WorkoutSchema(Schema):
     @post_load
     def create_workout(self, data, **kwargs):
         return Workout(**data)
+    
+class WorkoutSchemaForUsers(Schema):
+    id = fields.Int(dump_only=True)
+    exercise_type = fields.Str(attribute="exercise_type.name")
+    day_of_week = fields.Str(attribute="day_of_week.name")
+    coach = fields.Str(attribute="coach.name")
+    date = fields.Date(required=True)
+    time = fields.Time(required=True)
+
+    @post_load
+    def create_workout(self, data, **kwargs):
+        return Workout(**data)
+
+
+class CoachSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    photo = fields.Str(allow_none=True)
+    description = fields.Str(allow_none=True)
+    workouts = fields.Nested(WorkoutSchemaForUsers, many=True, allow_none=True)
+
+    @post_dump
+    def add_default_workout_type(self, data, **kwargs):
+        if not data.get('workouts'):
+            data['workouts'] = [{'exercise_type': 'Персональный тренер'}] 
+        return data
+
+
+class PriceSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    price = fields.Float(required=True)
+
+    @post_load
+    def create_price(self, data, **kwargs):
+        return Price(**data)
+
+
 
 class WorkoutSchemaForUsers(Schema):
     id = fields.Int(dump_only=True)

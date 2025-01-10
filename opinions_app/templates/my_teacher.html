@@ -27,23 +27,20 @@
                 alert('Ошибка: ' + error.message);
             }
         }
-
         function populateCoachesList(coaches) {
             const coachesList = document.getElementById('coachesList');
             coachesList.innerHTML = '';
+
             coaches.forEach(coach => {
                 const coachCard = document.createElement('div');
                 coachCard.className = 'coach-card';
-                
-                // Determine the workout type or default to "Персональный тренер"
-                const workoutType = (coach.workouts && coach.workouts.length > 0) 
-                    ? coach.workouts[0].exercise_type.name 
-                    : 'Персональный тренер';
+
+                const workoutType = coach.workouts.length > 0 ? coach.workouts[0].exercise_type : 'Тип тренировки не указан';
 
                 coachCard.innerHTML = `
                     <img src="${coach.photo ? staticUrl + coach.photo : ''}" alt="${coach.name}" class="coach-photo">
                     <h2 class="coach-name">${coach.name}</h2>
-                    <p class="coach-workout-type">${workoutType}</p> <!-- Display workout type here -->
+                    <p class="coach-workout-type">${workoutType}</p>
                     <p class="coach-description">${coach.description || 'Описание отсутствует'}</p>
                     <form class="booking-form" onsubmit="bookPersonalTraining(event)">
                         <input type="hidden" name="coach_id" value="${coach.id}">
@@ -54,10 +51,10 @@
                         <button type="submit">Записаться</button>
                     </form>
                 `;
+
                 coachesList.appendChild(coachCard);
             });
         }
-        
         document.addEventListener('DOMContentLoaded', fetchCoaches);
 
         async function bookPersonalTraining(event) {

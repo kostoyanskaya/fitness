@@ -27,8 +27,9 @@
     <a href="#">SPORT</a>
   </div>  
   <nav>
-    <form class="search" action="search.php"> 
+    <form class="search" action="{{ url_for('search') }}" method="get"> 
       <input name="q" placeholder="Search..." type="search">
+      <button type="submit">Найти</button>
     </form>
     <ul>
 		<li><a href="{{ url_for('index_view') }}">О нас</a></li>

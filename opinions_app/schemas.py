@@ -1,12 +1,15 @@
-from marshmallow import Schema, fields, post_load, post_dump
-from .models import Price, Workout, Booking, PersonalTraining
 from datetime import time
+
+from marshmallow import fields, post_dump, post_load, Schema, ValidationError
+
+from .models import Booking, PersonalTraining, Price, Workout
 
 
 class UserSchema(Schema):
     id = fields.Int()
-    username = fields.Str() 
+    username = fields.Str()
     email = fields.Str()
+
 
 class ExerciseTypeSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -16,6 +19,7 @@ class ExerciseTypeSchema(Schema):
 class DayOfWeekSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
+
 
 class WorkoutSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -28,12 +32,13 @@ class WorkoutSchema(Schema):
     @post_load
     def create_workout(self, data, **kwargs):
         return Workout(**data)
-    
+
+
 class WorkoutSchemaForUsers(Schema):
     id = fields.Int(dump_only=True)
-    exercise_type = fields.Str(attribute="exercise_type.name")
-    day_of_week = fields.Str(attribute="day_of_week.name")
-    coach = fields.Str(attribute="coach.name")
+    exercise_type = fields.Str(attribute='exercise_type.name')
+    day_of_week = fields.Str(attribute='day_of_week.name')
+    coach = fields.Str(attribute='coach.name')
     date = fields.Date(required=True)
     time = fields.Time(required=True)
 
@@ -52,7 +57,7 @@ class CoachSchema(Schema):
     @post_dump
     def add_default_workout_type(self, data, **kwargs):
         if not data.get('workouts'):
-            data['workouts'] = [{'exercise_type': 'Персональный тренер'}] 
+            data['workouts'] = [{'exercise_type': 'Персональный тренер'}]
         return data
 
 
@@ -66,18 +71,18 @@ class PriceSchema(Schema):
         return Price(**data)
 
 
-
 class WorkoutSchemaForUsers(Schema):
     id = fields.Int(dump_only=True)
-    exercise_type = fields.Str(attribute="exercise_type.name")
-    day_of_week = fields.Str(attribute="day_of_week.name")
-    coach = fields.Str(attribute="coach.name")
+    exercise_type = fields.Str(attribute='exercise_type.name')
+    day_of_week = fields.Str(attribute='day_of_week.name')
+    coach = fields.Str(attribute='coach.name')
     date = fields.Date(required=True)
     time = fields.Time(required=True)
 
     @post_load
     def create_workout(self, data, **kwargs):
         return Workout(**data)
+
 
 class BookingSchema(Schema):
     user_id = fields.Int(required=True)
@@ -86,16 +91,21 @@ class BookingSchema(Schema):
     @post_load
     def create_booking(self, data, **kwargs):
         return Booking(**data)
-    
+
+
 class PersonalTrainingSchema(Schema):
     id = fields.Int(dump_only=True)
     coach_id = fields.Int(required=False)
     coach_name = fields.String(required=False, attribute='coach.name')
     date = fields.Date(required=True)
     time = fields.Time(required=True)
-    day_of_week_name = fields.String(required=False, attribute='day_of_week.name')
+    day_of_week_name = fields.String(
+        required=False, attribute='day_of_week.name'
+    )
     user_id = fields.Int(required=True)
-    workout_type = fields.String(required=True, default="Персональная тренировка")
+    workout_type = fields.String(
+        required=True, default='Персональная тренировка'
+    )
 
     @post_load
     def create_personal_training(self, data, **kwargs):
@@ -103,4 +113,11 @@ class PersonalTrainingSchema(Schema):
         if date_value:
             day_of_week = date_value.weekday()
             data['day_of_week_id'] = day_of_week + 1
+        
+        training_time = data.get('time')
+        if training_time:
+            if not (time(9, 0) <= training_time <= time(21, 0)):
+                raise ValidationError("Время должно быть между 9:00 и 21:00.")
+        
         return PersonalTraining(**data)
+

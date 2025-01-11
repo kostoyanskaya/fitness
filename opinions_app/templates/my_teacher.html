@@ -27,6 +27,7 @@
                 alert('Ошибка: ' + error.message);
             }
         }
+        
         function populateCoachesList(coaches) {
             const coachesList = document.getElementById('coachesList');
             coachesList.innerHTML = '';
@@ -47,7 +48,7 @@
                         <label for="date">Дата:</label>
                         <input type="date" name="date" required>
                         <label for="time">Время:</label>
-                        <input type="time" name="time" required>
+                        <input type="time" name="time" required min="09:00" max="21:00">
                         <button type="submit">Записаться</button>
                     </form>
                 `;
@@ -55,6 +56,7 @@
                 coachesList.appendChild(coachCard);
             });
         }
+        
         document.addEventListener('DOMContentLoaded', fetchCoaches);
 
         async function bookPersonalTraining(event) {

@@ -1,18 +1,26 @@
-from flask import Flask, jsonify, request, render_template, flash, redirect, url_for, abort
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from .models import db, User, ExerciseType, DayOfWeek, Coach, Price, Workout, Booking, PersonalTraining
-from opinions_app import app
-from flask_login import login_user, logout_user, login_required, LoginManager
-from flask_login import current_user
-from datetime import datetime
 import os
+
+from flask import abort, jsonify, request
+from flask_bcrypt import Bcrypt
+from flask_login import (
+    current_user, LoginManager, login_required,
+    login_user, logout_user
+)
 import requests
-from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-from .schemas import UserSchema, ExerciseTypeSchema, DayOfWeekSchema, CoachSchema, WorkoutSchema, BookingSchema, PersonalTrainingSchema, WorkoutSchemaForUsers, PriceSchema
-from functools import wraps
+
+from opinions_app import app
 from .decorators import role_required, role_required_for_methods
+from .models import (
+    Booking, Coach, DayOfWeek, ExerciseType,
+    PersonalTraining, Price, User, Workout, db
+)
+from .schemas import (
+    BookingSchema, CoachSchema, DayOfWeekSchema,
+    ExerciseTypeSchema, PersonalTrainingSchema,
+    PriceSchema, UserSchema, WorkoutSchema,
+    WorkoutSchemaForUsers
+)
 from .validators import validate_registration_data
 
 login_manager = LoginManager(app)
@@ -24,38 +32,6 @@ bcrypt = Bcrypt(app)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-
-@app.route('/api/register', methods=['POST'])
-def api_register():
-    data = request.get_json()
-    fullname = data.get('fullname')
-    email = data.get('email')
-    password = data.get('password')
-    confirmpassword = data.get('confirmpassword')
-    validation_error = validate_registration_data(
-        fullname, email, password, confirmpassword
-    )
-    if validation_error:
-        return validation_error
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-    new_user = User(username=fullname, email=email, password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify('Ваш аккаунт был создан!'), 201
-
-
-@app.route('/api/login', methods=['POST'])
-def api_login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    user = User.query.filter_by(username=username).first()
-    if user and bcrypt.check_password_hash(user.password, password):
-        login_user(user)
-        return jsonify('Вход успешен!'), 200
-    return jsonify('Вход не удался. Пожалуйста, проверьте имя и пароль!'), 401
 
 
 @app.route('/api/users', methods=['GET'])
@@ -98,9 +74,12 @@ def handle_exercise_types():
         exercise_types = ExerciseType.query.all()
         if not exercise_types:
             abort(404)
-        exercise_types_list = exercise_type_schema.dump(exercise_types, many=True)
+        exercise_types_list = exercise_type_schema.dump(
+            exercise_types,
+            many=True
+        )
         return jsonify(exercise_types_list), 200
-    
+
     data = request.get_json()
     new_exercise_type = exercise_type_schema.load(data)
     exercise_type = ExerciseType(**new_exercise_type)
@@ -108,6 +87,7 @@ def handle_exercise_types():
     db.session.commit()
     response = exercise_type_schema.dump(exercise_type)
     return jsonify(response), 201
+
 
 @app.route('/api/exercise_types/<int:id>', methods=['DELETE'])
 @role_required('admin')
@@ -118,6 +98,7 @@ def delete_exercise_type(id):
     db.session.delete(exercise_type)
     db.session.commit()
     return jsonify('Тип упражнения успешно удален'), 200
+
 
 @app.route('/api/days_of_week', methods=['GET', 'POST'])
 @role_required_for_methods()
@@ -136,7 +117,8 @@ def handle_days_of_week():
     day_of_week = DayOfWeek(**new_day_of_week)
     db.session.add(day_of_week)
     db.session.commit()
-    return jsonify(day_of_week_schema.dump(day_of_week)), 201 
+    return jsonify(day_of_week_schema.dump(day_of_week)), 201
+
 
 @app.route('/api/days_of_week/<int:id>', methods=['DELETE'])
 @role_required('admin')
@@ -147,6 +129,7 @@ def delete_day_of_week(id):
     db.session.delete(day_of_week)
     db.session.commit()
     return jsonify('День недели успешно удален'), 200
+
 
 @app.route('/api/coaches', methods=['GET', 'POST'])
 @role_required_for_methods()
@@ -175,12 +158,15 @@ def handle_coaches():
             return jsonify('Не удалось загрузить изображение'), 400
     new_coach_data = coach_schema.load(data)
     new_coach = Coach(
-        name=new_coach_data['name'], description=new_coach_data.get('description'), photo=photo_path
+        name=new_coach_data['name'],
+        description=new_coach_data.get('description'),
+        photo=photo_path
     )
     db.session.add(new_coach)
     db.session.commit()
 
     return jsonify(coach_schema.dump(new_coach)), 201
+
 
 @app.route('/api/coaches/<int:id>', methods=['DELETE'])
 @role_required('admin')
@@ -191,6 +177,7 @@ def delete_coach(id):
     db.session.delete(coach)
     db.session.commit()
     return jsonify('Тренер удален успешно'), 200
+
 
 @app.route('/api/prices', methods=['GET', 'POST'])
 @role_required_for_methods()
@@ -209,6 +196,7 @@ def handle_prices():
     db.session.commit()
     return price_schema.dump(new_price), 201
 
+
 @app.route('/api/prices/<int:id>', methods=['DELETE'])
 @role_required('admin')
 def delete_price(id):
@@ -224,7 +212,7 @@ def delete_price(id):
 @role_required_for_methods()
 def handle_workouts():
     workout_schema = WorkoutSchema()
-    
+
     if request.method == 'GET':
         workout_schema_get = WorkoutSchemaForUsers()
         workouts = Workout.query.all()
@@ -238,6 +226,7 @@ def handle_workouts():
     db.session.commit()
     return workout_schema.dump(new_workout), 201
 
+
 @app.route('/api/bookings', methods=['POST'])
 def book_workouts():
     booking_schema = BookingSchema()
@@ -246,6 +235,7 @@ def book_workouts():
     db.session.add(new_booking)
     db.session.commit()
     return jsonify('Успешно записаны на тренировку.'), 201
+
 
 @app.route('/api/personal_trainings', methods=['POST'])
 @login_required
@@ -256,11 +246,12 @@ def book_personal_training():
     data['workout_type'] = "Персональная тренировка"
     coach = Coach.query.get(data['coach_id'])
     if not coach:
-        return jsonify('Тренер не найден или у него нет доступных типов тренировок.'), 404
+        return jsonify('Тренер не найден.'), 404
     new_training = personal_training_schema.load(data)
-    db.session.add(new_training)  
+    db.session.add(new_training)
     db.session.commit()
     return jsonify('Успешно записано на персональную тренировку.'), 201
+
 
 @app.route('/api/user/trainings', methods=['GET'])
 def get_user_trainings():
@@ -272,19 +263,26 @@ def get_user_trainings():
             workout = Workout.query.get(booking.workout_id)
             workouts.append(workout)
         workouts_data = workout_schema.dump(workouts)
-        personal_workouts = PersonalTraining.query.filter_by(user_id=current_user.id).all()
+        personal_workouts = PersonalTraining.query.filter_by(
+            user_id=current_user.id
+        ).all()
         personal_training_schema = PersonalTrainingSchema(many=True)
-        personal_workouts_data = personal_training_schema.dump(personal_workouts)
+        personal_workouts_data = personal_training_schema.dump(
+            personal_workouts
+        )
         return jsonify({
             'workouts': workouts_data,
             'personal_workouts': personal_workouts_data
         }), 200
     return jsonify('Нет доступа'), 401
 
+
 @app.route('/api/bookings/<int:workout_id>', methods=['DELETE'])
 @login_required
 def cancel_booking(workout_id):
-    booking = Booking.query.filter_by(workout_id=workout_id, user_id=current_user.id).first()
+    booking = Booking.query.filter_by(
+        workout_id=workout_id, user_id=current_user.id
+    ).first()
     if not booking:
         return jsonify('Тренировка не найдена.')
     db.session.delete(booking)
@@ -292,7 +290,11 @@ def cancel_booking(workout_id):
 
     return jsonify('Тренировка отменена.'), 200
 
-@app.route('/api/cancel_personal_booking/<int:personal_booking_id>', methods=['DELETE'])
+
+@app.route(
+        '/api/cancel_personal_booking/<int:personal_booking_id>',
+        methods=['DELETE']
+    )
 def cancel_personal_booking(personal_booking_id):
     if current_user.is_authenticated:
         personal_booking = PersonalTraining.query.filter_by(
@@ -327,3 +329,35 @@ def create_admin():
     db.session.add(new_admin)
     db.session.commit()
     return jsonify('Администратор успешно создан!'), 201
+
+
+@app.route('/api/register', methods=['POST'])
+def api_register():
+    data = request.get_json()
+    fullname = data.get('fullname')
+    email = data.get('email')
+    password = data.get('password')
+    confirmpassword = data.get('confirmpassword')
+    validation_error = validate_registration_data(
+        fullname, email, password, confirmpassword
+    )
+    if validation_error:
+        return validation_error
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    new_user = User(username=fullname, email=email, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify('Ваш аккаунт был создан!'), 201
+
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    user = User.query.filter_by(username=username).first()
+    if user and bcrypt.check_password_hash(user.password, password):
+        login_user(user)
+        return jsonify('Вход успешен!'), 200
+    return jsonify('Вход не удался. Пожалуйста, проверьте имя и пароль!'), 401

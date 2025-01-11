@@ -1,19 +1,18 @@
-from flask import  flash, redirect, render_template, url_for, request, session
+import os
 
-from opinions_app import app, db
-
-from flask_login import login_user, login_required, logout_user, current_user
+from flask import redirect, render_template, request, url_for
 from flask_bcrypt import Bcrypt
-from .forms import RegistrationForm, LoginForm, WorkoutForm, BookingForm
-from .models import User, Workout, Booking, ExerciseType, DayOfWeek, Coach, PersonalTraining, Price
-from werkzeug.utils import secure_filename
+from flask_login import current_user
 
+from opinions_app import app
 
 bcrypt = Bcrypt(app)
+
 
 @app.route('/register')
 def register():
     return render_template('login.html')
+
 
 @app.route('/home')
 def index_view():
@@ -25,9 +24,8 @@ def index_view():
 def me_view():
     if current_user.is_authenticated:
         return render_template('person.html')
-    else:
-        return redirect(url_for('register'))
-    
+    return redirect(url_for('register'))
+
 
 @app.route('/booking')
 def book_workout():
@@ -40,13 +38,39 @@ def teacher_view():
         'my_teacher.html', static_url=url_for('static', filename='')
     )
 
+
 @app.route('/contacts')
 def information_view():
     """Контакты."""
     return render_template('contacts.html')
+
 
 @app.route('/price')
 def price_view():
     """Ценообразование."""
     return render_template('cost.html')
 
+TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+
+def search_in_templates(query):
+    results = []
+    for filename in os.listdir(TEMPLATES_DIR):
+        if filename.endswith(".html") and filename != "base.html":
+            with open(os.path.join(TEMPLATES_DIR, filename), 'r', encoding='utf-8') as f:
+                content = f.read()
+                if query.lower() in content.lower():
+                    results.append(filename)
+    return results
+
+
+@app.route('/search')
+def search():
+    query = request.args.get('q')
+    results = search_in_templates(query)
+    if results:
+        return redirect(url_for('redirect_to_template', filename=results[0]))
+    return render_template('search_results.html', results=results, query=query)
+
+@app.route('/redirect_to/<filename>')
+def redirect_to_template(filename):
+    return render_template(filename, static_url=url_for('static', filename=''))

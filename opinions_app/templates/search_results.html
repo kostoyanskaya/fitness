@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты поиска для "{{ query }}"</title>
+</head>
+<body>
+    <h1>Результаты поиска для "{{ query }}"</h1>
+    <ul>
+        {% if results %}
+            {% for result in results %}
+                <li>
+                    <a href="{{ url_for(result[:-5]) }}"> {{ result }} </a> <!-- Удаляем .html из имени -->
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>Нет совпадений.</li>
+        {% endif %}
+    </ul>
+    <a href="{{ url_for('index_view') }}">Вернуться на главную</a>
+</body>
+</html>
+{% endblock %}

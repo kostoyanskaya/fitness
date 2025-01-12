@@ -38,14 +38,14 @@
         <ul class="mega-dropdown">
           <li class="row">
             <ul class="mega-col">
-              <li><a href="#">Время занятий</a></li>
+              <li><a href="#"></a></li>
               <li><a href="{{ url_for('price_view') }}">Ценообразование</a></li>
             </ul>
           </li>
         </ul>        
       </li>
       <li class="dropdown">
-        <a href="">Личные тренировки</a>
+        <a href="{{ url_for('me_view') }}">Личные тренировки</a>
         <ul>
           <li><a href="{{ url_for('me_view') }}">Личный кабинет</a></li>
           {% if not current_user.is_authenticated %}

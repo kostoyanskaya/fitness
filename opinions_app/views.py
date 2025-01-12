@@ -1,10 +1,9 @@
-import os
-
 from flask import redirect, render_template, request, url_for
 from flask_bcrypt import Bcrypt
 from flask_login import current_user
 
 from opinions_app import app
+from .utils import search_in_templates
 
 bcrypt = Bcrypt(app)
 
@@ -50,18 +49,6 @@ def price_view():
     """Ценообразование."""
     return render_template('cost.html')
 
-TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
-
-def search_in_templates(query):
-    results = []
-    for filename in os.listdir(TEMPLATES_DIR):
-        if filename.endswith(".html") and filename != "base.html":
-            with open(os.path.join(TEMPLATES_DIR, filename), 'r', encoding='utf-8') as f:
-                content = f.read()
-                if query.lower() in content.lower():
-                    results.append(filename)
-    return results
-
 
 @app.route('/search')
 def search():
@@ -70,6 +57,7 @@ def search():
     if results:
         return redirect(url_for('redirect_to_template', filename=results[0]))
     return render_template('search_results.html', results=results, query=query)
+
 
 @app.route('/redirect_to/<filename>')
 def redirect_to_template(filename):

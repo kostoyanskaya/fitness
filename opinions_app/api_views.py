@@ -217,7 +217,7 @@ def handle_workouts():
         workout_schema_get = WorkoutSchemaForUsers()
         workouts = Workout.query.all()
         if not workouts:
-            abort(404, description='Цена не найдена')
+            abort(404, description='Нет тренировок')
         return jsonify(workout_schema_get.dump(workouts, many=True)), 200
 
     data = request.get_json()

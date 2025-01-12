@@ -113,11 +113,10 @@ class PersonalTrainingSchema(Schema):
         if date_value:
             day_of_week = date_value.weekday()
             data['day_of_week_id'] = day_of_week + 1
-        
+
         training_time = data.get('time')
         if training_time:
             if not (time(9, 0) <= training_time <= time(21, 0)):
                 raise ValidationError("Время должно быть между 9:00 и 21:00.")
-        
-        return PersonalTraining(**data)
 
+        return PersonalTraining(**data)

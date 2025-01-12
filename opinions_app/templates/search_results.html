@@ -12,7 +12,7 @@
         {% if results %}
             {% for result in results %}
                 <li>
-                    <a href="{{ url_for(result[:-5]) }}"> {{ result }} </a> <!-- Удаляем .html из имени -->
+                    <a href="{{ url_for(result[:-5]) }}"> {{ result }} </a>
                 </li>
             {% endfor %}
         {% else %}

@@ -3,13 +3,13 @@ html, body * { box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
 body {
   background:
     -webkit-linear-gradient(
-    rgba(246,247,249,0.8),
-    rgba(246,247,249,0.8)),
+    rgba(255, 255, 255, 0.8),
+    rgba(243, 242, 239, 0.8)),
     url(https://dl.dropboxusercontent.com/u/22006283/preview/codepen/sky-clouds-cloudy-mountain.jpg) no-repeat center center fixed;
   background:
     linear-gradient(
-    rgba(246,247,249,0.8),
-    rgba(246,247,249,0.8)),
+    rgba(156, 148, 132, 0.8),
+    rgba(141, 131, 124, 0.8)),
     url(https://dl.dropboxusercontent.com/u/22006283/preview/codepen/sky-clouds-cloudy-mountain.jpg) no-repeat center center fixed;
   background-size: cover;
 }
@@ -25,13 +25,13 @@ body {
   width: 430px;
   background:
     -webkit-linear-gradient(
-    rgba(35,43,85,0.75),
-    rgba(35,43,85,0.95)),
+    rgba(1, 1, 17, 0.75),
+    rgba(2, 6, 25, 0.95)),
     url(https://dl.dropboxusercontent.com/u/22006283/preview/codepen/clouds-cloudy-forest-mountain.jpg) no-repeat center center;
   background:
     linear-gradient(
-    rgba(35,43,85,0.75),
-    rgba(35,43,85,0.95)),
+    rgba(5, 8, 20, 0.75),
+    rgba(4, 8, 29, 0.95)),
     url(https://dl.dropboxusercontent.com/u/22006283/preview/codepen/clouds-cloudy-forest-mountain.jpg) no-repeat center center;
   background-size: cover;
   margin-left: auto;
@@ -83,7 +83,7 @@ li {
   padding-bottom: 10px;
   color: #ffffff;
   text-decoration: none;
-  border-bottom: solid 2px #1059FF;
+  border-bottom: solid 2px #eeff56;
   -webkit-transition: all .25s ease;
   transition: all .25s ease;
   cursor: pointer;
@@ -101,7 +101,7 @@ li {
   cursor: pointer;
   color: #ffffff;
   text-decoration: none;
-  border-bottom: solid 2px #1059FF;
+  border-bottom: solid 2px #ffd06a;
   padding-bottom: 10px;
 }
 
@@ -289,7 +289,7 @@ label {
 
 /* on checked */
 [type="checkbox"]:checked + label:before {
-  background: #0F4FE6; 
+  background: #fff177; 
 }
 
 [type="checkbox"]:checked + label:after {
@@ -341,7 +341,7 @@ label {
 	border: none;
 	border-radius: 20px;
   margin-top: 23px;
-  background-color: #1059FF;
+  background-color: #fff177;
 }
 
 .btn-signin {
@@ -367,7 +367,7 @@ label {
 	border: none;
 	border-radius: 20px;
   margin-top: 23px;
-  background-color: rgba(16,89,255, 1);
+  background-color: rgb(255, 252, 86);
   left: 0px;
   top: 0px;
   -webkit-transition: all .5s ease, top .5s ease .5s, height .5s ease .5s, background-color .5s ease .75s;
@@ -386,7 +386,7 @@ label {
 
 a.btn-signup:hover, a.btn-signin:hover {
     cursor: pointer; 
-    background-color: #0F4FE6;
+    background-color: #ffed4d;
     -webkit-transition: background-color .5s;
     transition: background-color .5s; 
 }
@@ -425,7 +425,7 @@ a.btn-signup:hover, a.btn-signin:hover {
   width: 100%;
   height: 50px;
   position: relative;
-  color: rgba(35,43,85,0.75);
+  color: rgba(149, 125, 16, 0.75);
   opacity: 0;
   -webkit-transition: opacity .1s ease 1s, -webkit-transform 1.5s ease .25s;
   transition: opacity .1s ease 1s, -webkit-transform 1.5s ease .25s;
@@ -507,9 +507,9 @@ h1 {
   text-transform: uppercase;
   font-size: 13px;
   text-align: center;
-  color: #1059FF;
+  color: #f4f42f;
   margin-top: -8px;
-  border: solid 1px #1059FF;
+  border: solid 1px #f4d851;
   opacity: 0;
   -webkit-transition: top 1.5s ease 0.35s, opacity .75s ease .5s;
   transition: top 1.5s ease 0.35s, opacity .75s ease .5s;
@@ -522,7 +522,7 @@ h1 {
 
 a.btn-goback:hover {
     cursor: pointer; 
-    background-color: #0F4FE6;
+    background-color: #fcff43;
     -webkit-transition: all .5s;
     transition: all .5s; 
     color: #ffffff;
@@ -554,7 +554,30 @@ a.btn-goback:hover {
 
 .refreshicon:hover {
   cursor: pointer;
-  fill: #1059FF;
+  fill: #ffee38;
   -webkit-transform: rotate(180deg);
           transform: rotate(180deg);
+}
+
+.back-button {
+  position: fixed; /* фиксированное положение */
+  top: 20px; /* от верхней границы */
+  right: 20px; /* от правой границы */
+  width: 50px; /* ширина кнопки */
+  height: 50px; /* высота кнопки */
+  background-color: rgba(255, 255, 255, 0.8); /* цвет фона с прозрачностью */
+  border: none; /* без границы */
+  border-radius: 50%; /* делать кнопку круглой */
+  font-size: 20px; /* размер шрифта */
+  color: #35424a; /* цвет текста */
+  text-align: center; /* центровка текста */
+  line-height: 50px; /* выравнивание текста по центру вертикально */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* тень */
+  transition: background-color 0.3s; /* плавный переход цвета фона при наведении */
+  text-decoration: none; /* убрать подчеркивание */
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 1); /* более плотный цвет при наведении */
+  cursor: pointer; /* курсор при наведении */
 }

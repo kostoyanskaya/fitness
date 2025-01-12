@@ -12,36 +12,37 @@
   <div class="frame">
     <div class="nav">
       <ul class="links">
-        <li class="signin-active"><a class="btn">Sign in</a></li>
-        <li class="signup-inactive"><a class="btn">Sign up </a></li>
+        <li class="signin-active"><a class="btn">Войти</a></li>
+        <li class="signup-inactive"><a class="btn">Регистрация </a></li>
       </ul>
     </div>
     <div ng-app ng-init="checked = false">
       <form class="form-signin" id="loginForm">
-        <label for="username">Username</label>
+        <label for="username">Имя</label>
         <input class="form-styling" type="text" name="username" placeholder="Enter your username" required/>
-        <label for="password">Password</label>
+        <label for="password">Пароль</label>
         <input class="form-styling" type="password" name="password" placeholder="Enter your password" required/>
         <input type="checkbox" id="checkbox"/>
         <label for="checkbox"><span class="ui"></span></label>
         <div class="btn-animate">
-          <button type="submit" class="btn-signin">Sign in</button>
+          <button type="submit" class="btn-signin">Войти</button>
+          <a class="back-button" href="{{ url_for('index_view') }}">&#x2190;</a> 
         </div>
       </form>
       <form class="form-signup" id="registration-form" method="post" name="form">
-        <label for="fullname">Full name</label>
+        <label for="fullname">Имя</label>
         <input class="form-styling" type="text" name="fullname" placeholder="Enter your full name" required/>
         
         <label for="email">Email</label>
         <input class="form-styling" type="email" name="email" placeholder="Enter your email" required/>
         
-        <label for="password">Password</label>
+        <label for="password">Пароль</label>
         <input class="form-styling" type="password" name="password" placeholder="Enter your password" required/>
         
-        <label for="confirmpassword">Confirm password</label>
+        <label for="confirmpassword">Подтвердить пароль</label>
         <input class="form-styling" type="password" name="confirmpassword" placeholder="Confirm your password" required/>
         
-        <button type="submit" class="btn-signup">Sign Up</button>
+        <button type="submit" class="btn-signup">Регистрация</button>
       
       </form>
       
@@ -51,7 +52,7 @@
           <path fill="#ffffff" d="..."/>
         </svg>
         <div class="successtext">
-          <p> Thanks for signing up! Check your email for confirmation.</p>
+          <p> Данные введены неверно, попробуйте еще раз.</p>
         </div>
       </div>
     </div>
@@ -63,7 +64,7 @@
       <div>
         <div class="cover-photo"></div>
         <div class="profile-photo"></div>
-        <h1 class="welcome">Welcome, Chris</h1>
+        <h1 class="welcome">Попробуйте еще раз.</h1>
         <a class="btn-goback" value="Refresh" onClick="history.go()">Go back</a>
       </div>
   </div>

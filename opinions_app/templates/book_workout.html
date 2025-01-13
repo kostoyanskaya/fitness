@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='stylebook.css') }}"> 
     <title>Запись на тренировки</title>
     <script>
+        const currentUserId = {{ current_user.id if current_user.is_authenticated else 'null' | tojson }};
+    
         async function bookWorkout(workoutId) {
+            if (currentUserId === null) {
+                alert('Вы должны быть авторизованы, чтобы записаться на тренировку.');
+                return;
+            }
+            
             try {
                 const response = await fetch('/api/bookings', {
                     method: 'POST',
@@ -15,21 +22,27 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        user_id: 1, // Замените на реальный ID пользователя
+                        user_id: currentUserId,
                         workout_id: workoutId
                     })
                 });
 
+                const result = await response.json();
+                // Очистка сообщения об ошибке
+                document.getElementById('bookingMessage').innerText = '';
+
                 if (!response.ok) {
-                    throw new Error('Не удалось записаться на тренировку');
+                    // Установка текст ошибки
+                    throw new Error(result); // Используем текст из результата
                 }
 
-                const result = await response.json();
                 alert(result);
             } catch (error) {
-                alert('Ошибка: ' + error.message);
+                // Установка текст ошибки в элемент
+                document.getElementById('bookingMessage').innerText = error.message;
             }
         }
+
         async function fetchWorkouts() {
             try {
                 const response = await fetch('/api/workouts');
@@ -71,8 +84,6 @@
 <body>
     <div class="background-image"></div>
     <div class="container">
-        <div class="info-box">
-            <h1>Запись на тренировки</h1>
             <div class="training-table">
                 <h2>Расписание тренировок</h2>
                 <table>
@@ -89,6 +100,7 @@
                     <tbody id="workoutTableBody">
                     </tbody>
                 </table>
+                <div id="bookingMessage" style="color: rgb(255, 255, 255); margin-top: 10px; text-align: center;"></div>
             </div>
         </div>
     </div>

@@ -22,6 +22,7 @@ from .schemas import (
     WorkoutSchemaForUsers
 )
 from .validators import validate_registration_data
+from marshmallow import ValidationError
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'register'
@@ -232,6 +233,12 @@ def book_workouts():
     booking_schema = BookingSchema()
     data = request.get_json()
     new_booking = booking_schema.load(data)
+    existing_booking = Booking.query.filter_by(
+        user_id=new_booking.user_id,
+        workout_id=new_booking.workout_id
+    ).first()
+    if existing_booking:
+        return jsonify('Вы уже успешно записаны на эту тренировку.'), 400
     db.session.add(new_booking)
     db.session.commit()
     return jsonify('Успешно записаны на тренировку.'), 201
@@ -342,7 +349,7 @@ def api_register():
         fullname, email, password, confirmpassword
     )
     if validation_error:
-        return validation_error
+        return jsonify({'message': validation_error[0]}), validation_error[1]
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(username=fullname, email=email, password=hashed_password)
     db.session.add(new_user)

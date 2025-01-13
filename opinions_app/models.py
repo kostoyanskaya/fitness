@@ -3,6 +3,7 @@ from datetime import datetime
 from flask_login import UserMixin
 
 from opinions_app import db
+from sqlalchemy import Index
 
 
 class User(db.Model, UserMixin):

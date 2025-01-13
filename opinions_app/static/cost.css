@@ -1,80 +1,46 @@
-.nesolestag-enadenud {
-    width: 615px;
-    margin: 0 auto;
-}
-
-.kesednsoled:after,
-.kesednsoled:before {
-    content: ".";
-    display: block;
-    overflow: hidden;
-    visibility: hidden;
-    font-size: 0;
-    line-height: 0;
-    width: 0;
-    height: 0;
-    clear: both;
-}
-.ico-wrap {
-    color: #a612d4;
-    width: 48px;
-    height: 48px;
-    margin: 30px 18px 5px 5px;
-    display: block;
-    text-align: center;
-    font-size: 25px;
-    border: 2px solid #9d1cb7;
-    float: left;
-    border-radius: 30px;
-}
-.ico-contact {
-    line-height: 1.9 !important;
-}
-.meanous-andscoev {
-    float: left;
-    margin-bottom: 20px;
-}
-.aio-icon-title {
-    font-size: 16px;
-    color: #950c96;
-    line-height: 1;
-    margin-bottom: 8px;
-}
-
-@media (max-width: 767px) {
-    .meanous-andscoev,
-    .ico-wrap {
-        float: none;
-        text-align: center;
-    }
-    .ico-wrap {
-        margin: 0 auto 15px auto;
-    }
-}
-
 .contacts-container {
     display: flex;
-    justify-content: center;  /* Центрирование по горизонтали */
-    align-items: center;      /* Центрирование по вертикали */
-    height: 100vh;            /* Занимает всю высоту экрана */
-    padding: 20px;            /* Отступы вокруг */
+    justify-content: center;  
+    align-items: center;      
+    height: 100vh;            
+    width: 100%;             
 }
 
-.nesolestag-enadenud {
-    width: 615px;             /* Ширина блока */
-    padding: 20px;            /* Паддинг внутри блока */
-    border: 2px solid #9d1cb7; /* Граница блока */
-    border-radius: 15px;      /* Закругленные углы */
-    background-color: #000000; /* Цвет фона блока */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Тень для визуального эффекта */
-    margin: 0 auto;           /* Центрирование блока */
+.unique-prices-container {
+    width: 615px;             
+    padding: 20px;           
+    border: 2px solid #ebfa18; 
+    border-radius: 15px;      
+    background-color: #000000; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    display: flex;            /* Добавляем Flexbox для контейнера */
+    flex-direction: column;   /* Устанавливаем вертикальное направление */
+    align-items: flex-start;  /* Выравниваем элементы в начале контейнера */
+}
+
+.price-icon-wrap {
+    color: #fcf811; 
+    width: 100%;          /* Устанавливаем ширину на 100% для выравнивания */
+    display: flex;       /* Используем Flexbox для выравнивания значков и текста */
+    align-items: center; /* Центрируем по вертикали */
+    margin-bottom: 20px; /* Отступ между элементами */
 }
 
 .circle {
-    width: 48px;  /* Ширина кружочка */
-    height: 48px; /* Высота кружочка */
-    background-color: #a612d4; /* Цвет фона */
-    border-radius: 50%; /* Закругление для получения кружочка */
-    margin: 30px 18px 5px 5px; /* Отступы, как у бокса */
-    display: inline-block; /* Отображение как блок */
+    width: 48px; 
+    height: 48px; 
+    background-color: #ecff1f; 
+    border-radius: 50%; 
+    margin-right: 10px;  /* Отступ справа от иконки */
+}
+
+.price-title {
+    font-size: 16px; 
+    color: #efff0e; 
+    margin: 0;          /* Убираем отступы, чтобы было аккуратно */
+}
+
+.aio-icon-description {
+    margin: 0;         /* Убираем отступы для описания */
+    color: #fff;       /* Убедитесь, что текст виден на черном фоне */
 }

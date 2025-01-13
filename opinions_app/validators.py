@@ -19,12 +19,11 @@ def validate_registration_data(fullname, email, password, confirmpassword):
     if not fullname or not password or not email:
         return 'Имя, пароль и адрес почты обязательны!', 400
     if User.query.filter_by(username=fullname).first():
-        return jsonify('Имя пользователя уже существует!'), 400
+        return 'Имя пользователя уже существует!', 400
     if User.query.filter_by(email=email).first():
-        return jsonify('Адрес электронной почты уже используется!'), 400
+        return 'Адрес электронной почты уже используется!', 400
     if password != confirmpassword:
-        return jsonify('Пароли не совпадают!'), 400
+        return 'Пароли не совпадают!', 400
     if not validate_password(password):
-        return jsonify('Не менее 8 символов, хотя'
-                       'бы одна цифра и без символов.'), 400
+        return 'Пароль должен содержать минимум 8 символов, включая хотя бы одну цифру и не должен содержать специальных символов.', 400
     return None

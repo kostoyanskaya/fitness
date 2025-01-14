@@ -230,34 +230,38 @@ def handle_workouts():
 
 @app.route('/api/bookings', methods=['POST'])
 def book_workouts():
-    booking_schema = BookingSchema()
-    data = request.get_json()
-    new_booking = booking_schema.load(data)
-    existing_booking = Booking.query.filter_by(
-        user_id=new_booking.user_id,
-        workout_id=new_booking.workout_id
-    ).first()
-    if existing_booking:
-        return jsonify('Вы уже успешно записаны на эту тренировку.'), 400
-    db.session.add(new_booking)
-    db.session.commit()
-    return jsonify('Успешно записаны на тренировку.'), 201
+    if current_user.is_authenticated:
+        booking_schema = BookingSchema()
+        data = request.get_json()
+        user_id = current_user.id
+        new_booking = booking_schema.load({**data, 'user_id': user_id})
+        existing_booking = Booking.query.filter_by(
+            user_id=user_id,
+            workout_id=new_booking.workout_id
+        ).first()
+        if existing_booking:
+            return jsonify('Вы уже записаны на эту тренировку.'), 400
+        db.session.add(new_booking)
+        db.session.commit()
+        return jsonify('Успешно записаны на тренировку.'), 201
+    return jsonify('Войдите или зарегистрируйтесь для записи'), 401
 
 
 @app.route('/api/personal_trainings', methods=['POST'])
-@login_required
 def book_personal_training():
-    personal_training_schema = PersonalTrainingSchema()
-    data = request.get_json()
-    data['user_id'] = current_user.id
-    data['workout_type'] = "Персональная тренировка"
-    coach = Coach.query.get(data['coach_id'])
-    if not coach:
-        return jsonify('Тренер не найден.'), 404
-    new_training = personal_training_schema.load(data)
-    db.session.add(new_training)
-    db.session.commit()
-    return jsonify('Успешно записано на персональную тренировку.'), 201
+    if current_user.is_authenticated:
+        personal_training_schema = PersonalTrainingSchema()
+        data = request.get_json()
+        data['user_id'] = current_user.id
+        data['workout_type'] = "Персональная тренировка"
+        coach = Coach.query.get(data['coach_id'])
+        if not coach:
+            return jsonify('Тренер не найден.'), 404
+        new_training = personal_training_schema.load(data)
+        db.session.add(new_training)
+        db.session.commit()
+        return jsonify('Успешно записаны на персональную тренировку.'), 201
+    return jsonify('Войдите или зарегистрируйтесь для записи'), 401
 
 
 @app.route('/api/user/trainings', methods=['GET'])

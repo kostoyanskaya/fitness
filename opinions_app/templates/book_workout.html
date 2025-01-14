@@ -8,7 +8,6 @@
     <title>Запись на тренировки</title>
     <script>
         const currentUserId = {{ current_user.id if current_user.is_authenticated else 'null' | tojson }};
-    
         async function bookWorkout(workoutId) {
             if (currentUserId === null) {
                 alert('Вы должны быть авторизованы, чтобы записаться на тренировку.');
@@ -22,8 +21,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        user_id: currentUserId,
-                        workout_id: workoutId
+                        workout_id: workoutId // Здесь только workout_id
                     })
                 });
 
@@ -105,4 +103,5 @@
         </div>
     </div>
 </body>
+{% include "footer.html" %}
 {% endblock %}

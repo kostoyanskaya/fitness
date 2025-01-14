@@ -15,15 +15,15 @@
     height: 0;
     clear: both;
 }
-.ico-wrap {
-    color: #a612d4;
+.contacts-ico-wrap {
+    color: #fff71c;
     width: 48px;
     height: 48px;
     margin: 30px 18px 5px 5px;
     display: block;
     text-align: center;
     font-size: 25px;
-    border: 2px solid #9d1cb7;
+    border: 2px solid #fffb1a;
     float: left;
     border-radius: 30px;
 }
@@ -36,7 +36,7 @@
 }
 .aio-icon-title {
     font-size: 16px;
-    color: #950c96;
+    color: #ebff15;
     line-height: 1;
     margin-bottom: 8px;
 }
@@ -57,15 +57,17 @@
     justify-content: center;  /* Центрирование по горизонтали */
     align-items: center;      /* Центрирование по вертикали */
     height: 100vh;            /* Занимает всю высоту экрана */
-    padding: 20px;            /* Отступы вокруг */
+    padding: 20px; 
+    width: 100%;       /* Отступы вокруг */
 }
 
 .nesolestag-enadenud {
     width: 615px;             /* Ширина блока */
     padding: 20px;            /* Паддинг внутри блока */
-    border: 2px solid #9d1cb7; /* Граница блока */
+    border: 2px solid #fffb19; /* Граница блока */
     border-radius: 15px;      /* Закругленные углы */
     background-color: #000000; /* Цвет фона блока */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Тень для визуального эффекта */
     margin: 0 auto;           /* Центрирование блока */
 }
+

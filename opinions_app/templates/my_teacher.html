@@ -50,6 +50,7 @@
                         <label for="time">Время:</label>
                         <input type="time" name="time" required min="09:00" max="21:00">
                         <button type="submit">Записаться</button>
+                        <div class="success-message" style="color: black; margin-top: 10px;"></div> <!-- Новый элемент для сообщения -->
                     </form>
                 `;
 
@@ -70,6 +71,8 @@
                 time: formData.get('time')
             };
 
+            const successMessageDiv = form.querySelector('.success-message'); // Получаем элемент для сообщения
+
             try {
                 const response = await fetch('/api/personal_trainings', {
                     method: 'POST',
@@ -79,15 +82,22 @@
                     body: JSON.stringify(data)
                 });
 
+                // Проверка на статус 401
+                if (response.status === 401) {
+                    successMessageDiv.textContent = 'Войдите или зарегистрируйтесь для записи';
+                    return;
+                }
+
                 if (!response.ok) {
                     throw new Error('Ошибка при бронировании тренировки');
                 }
 
                 const result = await response.json();
-                alert(result.message);
+                successMessageDiv.textContent = result;
                 form.reset();
             } catch (error) {
                 alert(error.message);
+                successMessageDiv.textContent = '';
             }
         }
     </script>

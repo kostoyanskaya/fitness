@@ -2,7 +2,7 @@ from flask import redirect, render_template, request, url_for
 from flask_bcrypt import Bcrypt
 from flask_login import current_user
 
-from opinions_app import app
+from fitness_app import app
 from .utils import search_in_templates
 
 bcrypt = Bcrypt(app)

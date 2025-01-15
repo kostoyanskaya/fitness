@@ -85,7 +85,7 @@ class WorkoutSchemaForUsers(Schema):
 
 
 class BookingSchema(Schema):
-    user_id = fields.Int(load_only=True)  # Добавьте load_only=True, если не хотите, чтобы оно возвращалось на клиент
+    user_id = fields.Int(load_only=True)
     workout_id = fields.Int(required=True)
 
     @post_load

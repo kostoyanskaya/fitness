@@ -9,7 +9,7 @@ from flask_login import (
 import requests
 from werkzeug.utils import secure_filename
 
-from opinions_app import app
+from fitness_app import app
 from .decorators import role_required, role_required_for_methods
 from .models import (
     Booking, Coach, DayOfWeek, ExerciseType,

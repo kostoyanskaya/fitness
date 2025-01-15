@@ -10,7 +10,7 @@ from flask_wtf.file import FileField, FileRequired
 from werkzeug.utils import secure_filename
 from wtforms import StringField, TextAreaField
 
-from opinions_app import app
+from fitness_app import app
 from .models import (db, Booking, Coach, DayOfWeek,
                      ExerciseType, PersonalTraining,
                      Price, User, Workout)

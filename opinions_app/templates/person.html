@@ -4,107 +4,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='stylesperson.css') }}"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesperson.css') }}">
     <title>Личный кабинет</title>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                const response = await fetch('/api/user/trainings');
-                if (!response.ok) {
+                const userResponse = await fetch('/api/users/{{ current_user.id }}'); // Получаем данные о пользователе
+                if (!userResponse.ok) {
+                    throw new Error('Ошибка загрузки данных о пользователе');
+                }
+                const userData = await userResponse.json();
+
+                // Отображаем информацию о пользователе
+                document.getElementById('user-name').innerText = userData.username; // предполагается, что поле username
+                document.getElementById('user-email').innerText = userData.email;
+
+                // Запрос на получение тренировок
+                const trainingResponse = await fetch('/api/user/trainings');
+                if (!trainingResponse.ok) {
                     throw new Error('Ошибка загрузки тренировок');
                 }
-                const data = await response.json();
-                displayWorkouts(data.workouts, data.personal_workouts);
+                const trainingData = await trainingResponse.json();
+                displayWorkouts(trainingData.workouts, trainingData.personal_workouts);
             } catch (error) {
                 console.error('Ошибка:', error.message);
-                alert('Не удалось загрузить данные о тренировках');
+                alert('Не удалось загрузить данные о пользователе или тренировках');
             }
         });
 
         function displayWorkouts(workouts, personalWorkouts) {
-    const workoutsTable = document.getElementById('workoutsTable');
-    const personalWorkoutsTable = document.getElementById('personalWorkoutsTable');
-    
-    if (workouts.length === 0) {
-        workoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных групповых тренировок.</td></tr>';
-    } else {
-        workouts.forEach(workout => {
-            const row = `<tr>
-                    <td>${workout.day_of_week}</td>
-                    <td>${workout.date}</td>
-                    <td>${workout.time}</td>
-                    <td>${workout.exercise_type}</td>
-                    <td>${workout.coach}</td>
-                    <td>
-                <td>
-                    <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
-                        <button type="submit" class="btn btn-danger">Отменить</button>
-                    </form>
-                </td>
-            </tr>`;
-            workoutsTable.insertAdjacentHTML('beforeend', row);
-        });
-    }
+            const workoutsTable = document.getElementById('workoutsTable');
+            const personalWorkoutsTable = document.getElementById('personalWorkoutsTable');
 
-    if (personalWorkouts.length === 0) {
-        personalWorkoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных персональных тренировок.</td></tr>';
-    } else {
-        personalWorkouts.forEach(personalWorkout => {
-            const row = `<tr>
-                <td>${personalWorkout.day_of_week_name}</td>
-                <td>${personalWorkout.date}</td>
-                <td>${personalWorkout.time}</td>
-                <td>${personalWorkout.workout_type}</td>
-                <td>${personalWorkout.coach_name}</td>
-                <td>
-                    <form onsubmit="event.preventDefault(); cancelPersonalBooking(${personalWorkout.id});" method="POST">
-                        <button type="submit" class="btn btn-danger">Отменить</button>
-                    </form>
-                </td>
-            </tr>`;
-            personalWorkoutsTable.insertAdjacentHTML('beforeend', row);
-        });
-    }
-}
+            if (workouts.length === 0) {
+                workoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных групповых тренировок.</td></tr>';
+            } else {
+                workouts.forEach(workout => {
+                    const row = `<tr>
+                        <td>${workout.day_of_week}</td>
+                        <td>${workout.date}</td>
+                        <td>${workout.time}</td>
+                        <td>${workout.exercise_type}</td>
+                        <td>${workout.coach}</td>
+                        <td>
+                            <form onsubmit="event.preventDefault(); cancelBooking(${workout.id});" method="POST">
+                                <button type="submit" class="btn btn-danger">Отменить</button>
+                            </form>
+                        </td>
+                    </tr>`;
+                    workoutsTable.insertAdjacentHTML('beforeend', row);
+                });
+            }
+
+            if (personalWorkouts.length === 0) {
+                personalWorkoutsTable.innerHTML = '<tr><td colspan="5">Нет записанных персональных тренировок.</td></tr>';
+            } else {
+                personalWorkouts.forEach(personalWorkout => {
+                    const row = `<tr>
+                        <td>${personalWorkout.day_of_week_name}</td>
+                        <td>${personalWorkout.date}</td>
+                        <td>${personalWorkout.time}</td>
+                        <td>${personalWorkout.workout_type}</td>
+                        <td>${personalWorkout.coach_name}</td>
+                        <td>
+                            <form onsubmit="event.preventDefault(); cancelPersonalBooking(${personalWorkout.id});" method="POST">
+                                <button type="submit" class="btn btn-danger">Отменить</button>
+                            </form>
+                        </td>
+                    </tr>`;
+                    personalWorkoutsTable.insertAdjacentHTML('beforeend', row);
+                });
+            }
+        }
+        function loadUserTrainings() {
+            const workoutsTableBody = document.getElementById('workoutsTable').getElementsByTagName('tbody')[0];
+            workoutsTableBody.innerHTML = ''; // Очищаем таблицу
+
+            fetch('/api/trainings')
+                .then(response => response.json())
+                .then(trainings => {
+                    trainings.forEach(training => {
+                        let row = workoutsTableBody.insertRow();
+                        let cell1 = row.insertCell(0);
+                        let cell2 = row.insertCell(1);
+                        let cell3 = row.insertCell(2);
+                        let cell4 = row.insertCell(3);
+                        let cell5 = row.insertCell(4);
+                        let cell6 = row.insertCell(5);
+
+                        cell1.innerText = training.day_of_week;
+                        cell2.innerText = training.date;
+                        cell3.innerText = training.time;
+                        cell4.innerText = training.type;
+                        cell5.innerText = training.trainer;
+                        cell6.innerHTML = `<button onclick="cancelBooking(${training.workout_id})">Отменить</button>`; // Кнопка для отмены
+                    });
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке тренировок:', error);
+                });
+        }
+
         function cancelBooking(bookingId) {
             console.log('Cancel booking for ID:', bookingId);
             fetch(`/api/bookings/${bookingId}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.status === 'success') {
-                        loadUserTrainings();
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data);
+                        });
                     }
+                    return response.json();
+                })
+                .then(message => {
+                    const cancelMessage = document.getElementById('cancelMessage');
+                    if (message === 'Тренировка отменена.') {
+                        cancelMessage.innerText = message;
+                        cancelMessage.style.color = 'black';
+                    } else {
+                        cancelMessage.innerText = message;
+                        cancelMessage.style.color = 'red';
+                    }
+
+                    loadUserTrainings();
                 })
                 .catch(error => {
                     console.error('Ошибка при отмене бронирования:', error.message);
-                    alert('Не удалось отменить бронирование.');
+                    const cancelMessage = document.getElementById('cancelMessage');
+                    cancelMessage.innerText = error.message || 'Не удалось отменить бронирование.'; // Выводим сообщение об ошибке
+                    cancelMessage.style.color = 'red'; // цвет текста для ошибки
                 });
         }
 
-        
         function cancelPersonalBooking(bookingId) {
             fetch(`/api/cancel_personal_booking/${bookingId}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.status === 'success') {
+                .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(message => {
+                        const cancelMessage = document.getElementById('cancelMessage');
+                        if (message === 'Тренировка отменена.') {
+                            cancelMessage.innerText = message;
+                            cancelMessage.style.color = 'black';
+                        } else {
+                            cancelMessage.innerText = message;
+                            cancelMessage.style.color = 'red';
+                        }
+
                         loadUserTrainings();
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка при отмене бронирования:', error.message);
-                    alert('Не удалось отменить бронирование.');
-                });
-        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при отмене бронирования:', error.message);
+                        const cancelMessage = document.getElementById('cancelMessage');
+                        cancelMessage.innerText = error.message || 'Не удалось отменить бронирование.'; // Выводим сообщение об ошибке
+                        cancelMessage.style.color = 'red'; // цвет текста для ошибки
+                    });
+            }
+
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Мой Личный Кабинет</h1>
-        
-        <h2>Групповые тренировки</h2>
-        <table id="workoutsTable" class="table">
+    <div class="personal-account-container">
+        <div class="user-info">
+            <div class="user-name" id="user-name">Загрузка имени...</div>
+            <div class="user-email" id="user-email">Загрузка email...</div>
+        </div>
+        <div class="user-image">
+            <img src="{{ url_for('static', filename='sport.jpg') }}" alt="User Image">
+        </div>
+        <table id="workoutsTable">
+            <thead>
+                <tr>
+                    <th>День недели</th>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Тип упражнения</th>
+                    <th>Тренер</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div id="cancelMessage" class="alert-message"></div>
+        <table id="personalWorkoutsTable">
             <thead>
                 <tr>
                     <th>День недели</th>
@@ -112,36 +200,13 @@
                     <th>Время</th>
                     <th>Тип тренировки</th>
                     <th>Тренер</th>
-                    <th>Действия</th>
+                    <th>Действие</th>
                 </tr>
             </thead>
             <tbody>
-                </tbody>
-            </table>
-        </div>
-        
-        <h2>Персональные тренировки</h2>
-        <table id="personalWorkoutsTable" class="table">
-            <thead>
-                <tr>
-                    <th>День недели</th>
-                    <th>Дата</th>
-                    <th>Время</th>
-                    <th>Тип тренировки</th>
-                    <th>Тренер</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
+        <div id="personalTrainingMessage" class="alert-message"></div>
     </div>
-
-</div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-</html>
 {% endblock %}

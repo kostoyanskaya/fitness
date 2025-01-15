@@ -82,7 +82,6 @@
                     body: JSON.stringify(data)
                 });
 
-                // Проверка на статус 401
                 if (response.status === 401) {
                     successMessageDiv.textContent = 'Войдите или зарегистрируйтесь для записи';
                     return;

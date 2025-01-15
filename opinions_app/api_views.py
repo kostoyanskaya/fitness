@@ -45,6 +45,15 @@ def get_users():
     users_list = user_schema.dump(users)
     return jsonify(users_list), 200
 
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+@login_required
+def get_user(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        abort(404)
+    user_schema = UserSchema()
+    return jsonify(user_schema.dump(user)), 200 
+
 
 @app.route('/api/logout', methods=['POST'])
 @login_required
@@ -314,7 +323,7 @@ def cancel_personal_booking(personal_booking_id):
         if personal_booking:
             db.session.delete(personal_booking)
             db.session.commit()
-            return jsonify('Персональная тренировка отменена.'), 200
+            return jsonify('Тренировка отменена.'), 200
         return jsonify('Персональная тренировка не найдена.'), 404
     return jsonify('Нет доступа'), 401
 

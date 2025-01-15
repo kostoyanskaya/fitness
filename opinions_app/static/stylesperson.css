@@ -1,60 +1,89 @@
-body {
+
+html, body {
     margin: 0;
-    font-family: Arial, sans-serif;
-}
-
-.container {
-    display: flex;
-    height: 100vh;
-}
-
-
-
-.right-panel {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.info-box {
-    background-color: rgb(85, 85, 87);
-    padding: 65px;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(213, 242, 69, 0.1);
-    width: 80%;
-}
-
-h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-p {
-    font-size: 18px;
-}
-
-.mini-table {
-    margin-top: 20px;
-}
-
-table {
+    padding: 0;
     width: 100%;
-    border-collapse: collapse;
+    height: 100%;
 }
 
-th, td {
-    border: 1px solid #ffffff;
-    padding: 8px;
+/* Основные стили для контейнера */
+.personal-account-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Центрирование по вертикали */
+    padding: 20px;
+    background-color: rgb(85, 85, 87);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(241, 240, 240, 0.1);
+    max-width: 800px; /* Максимальная ширина */
+    margin: 20px auto; /* Центрирование по горизонтали */
+}
+
+/* Стили для информации о пользователе */
+.user-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.user-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 2);
+}
+
+.user-email {
+    font-size: 16px;
+    color: #ffffff;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 2);
+}
+
+/* Стили для изображения пользователя */
+.user-image img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid #ddd;
+    margin-bottom: 20px; /* Отступ для блока изображения */
+}
+
+/* Стили для таблиц тренировок */
+#workoutsTable, #personalWorkoutsTable {
+    width: 100%; /* Занимает 100% ширины контейнера */
+    border-collapse: collapse;
+    margin-top: 20px;
+    max-width: 800px; /* Максимальная ширина для таблиц */
+}
+
+#workoutsTable th, #personalWorkoutsTable th {
+    background-color: #07080a;
+    color: white;
+    padding: 10px;
     text-align: left;
 }
 
-th {
-    background-color: #7c7364;
+#workoutsTable td, #personalWorkoutsTable td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
 
-.large-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 15px;
+#workoutsTable tr:hover, #personalWorkoutsTable tr:hover {
+    background-color: #f1f1f1;
+}
+
+.btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-danger {
+    background-color: #ffe014;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c1b138;
 }

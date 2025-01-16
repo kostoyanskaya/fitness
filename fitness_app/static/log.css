@@ -101,7 +101,7 @@ li {
   cursor: pointer;
   color: #ffffff;
   text-decoration: none;
-  border-bottom: solid 2px #ffd06a;
+  border-bottom: solid 2px #d50808;
   padding-bottom: 10px;
 }
 
@@ -289,7 +289,7 @@ label {
 
 /* on checked */
 [type="checkbox"]:checked + label:before {
-  background: #fff177; 
+  background: #1908ff; 
 }
 
 [type="checkbox"]:checked + label:after {
@@ -340,8 +340,8 @@ label {
   height: 35px;
 	border: none;
 	border-radius: 20px;
-  margin-top: 23px;
-  background-color: #fff177;
+  margin-top: 6px;
+  background-color: #ff10ff;
 }
 
 .btn-signin {
@@ -367,7 +367,7 @@ label {
 	border: none;
 	border-radius: 20px;
   margin-top: 23px;
-  background-color: rgb(255, 252, 86);
+  background-color: rgb(225, 201, 210);
   left: 0px;
   top: 0px;
   -webkit-transition: all .5s ease, top .5s ease .5s, height .5s ease .5s, background-color .5s ease .75s;
@@ -560,24 +560,24 @@ a.btn-goback:hover {
 }
 
 .back-button {
-  position: fixed; /* фиксированное положение */
-  top: 20px; /* от верхней границы */
-  right: 20px; /* от правой границы */
-  width: 50px; /* ширина кнопки */
-  height: 50px; /* высота кнопки */
-  background-color: rgba(255, 255, 255, 0.8); /* цвет фона с прозрачностью */
-  border: none; /* без границы */
-  border-radius: 50%; /* делать кнопку круглой */
-  font-size: 20px; /* размер шрифта */
-  color: #35424a; /* цвет текста */
-  text-align: center; /* центровка текста */
-  line-height: 50px; /* выравнивание текста по центру вертикально */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* тень */
-  transition: background-color 0.3s; /* плавный переход цвета фона при наведении */
-  text-decoration: none; /* убрать подчеркивание */
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  color: #35424a;
+  text-align: center;
+  line-height: 50px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+  text-decoration: none;
 }
 
 .back-button:hover {
-  background-color: rgba(255, 255, 255, 1); /* более плотный цвет при наведении */
-  cursor: pointer; /* курсор при наведении */
+  background-color: rgba(255, 255, 255, 1);
+  cursor: pointer;
 }

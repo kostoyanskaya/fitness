@@ -7,7 +7,7 @@ body {
 }
 
 .background-image {
-    background-image: url('{{ url_for("static", filename="sport2.jpg") }}');
+    background-image: url('{{ url_for("static", filename="uploads/sport2.jpg") }}');
     background-size: cover;
     background-position: center;
     position: absolute;
@@ -21,7 +21,7 @@ body {
 .custom-container {
     display: flex;
     flex-direction: column;
-    justify-content: center !important; /* Используем !important для переопределения */
+    justify-content: center !important;
     align-items: center;
     height: 100vh;
     text-align: center;
@@ -29,40 +29,40 @@ body {
 
 .custom-training-table {
     margin-top: 20px;
-    padding: 40px; /* Отступ для отображения */
-    background-color: rgba(230, 15, 15, 0.9); /* Полупрозрачный белый фон */
-    border-radius: 15px; /* Скругленные углы для контейнера */
+    padding: 40px;
+    background-color: rgba(230, 15, 15, 0.9);
+    border-radius: 15px;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
-    width: 60%; /* Ширина таблицы */
-    max-width: 1000px; /* Максимальная ширина таблицы */
-    display: flex; /* Используем flexbox для центрирования содержимого */
-    flex-direction: column; /* Убедимся, что элементы внутри располагаются вертикально */
-    align-items: center; /* Центрируем по горизонтали */
+    width: 60%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .training-table h2 {
-    font-size: 2.5rem; /* Увеличенный размер шрифта */
-    color: #ffffff; /* Цвет текста (можно изменить на любой другой) */
-    text-align: center; /* Центрируем заголовок */
-    margin-top: 20px; /* Отступ сверху для отделения от верхней части страницы */
-    text-shadow: 2px 2px 6px rgba(0, 0, 0, 2); /* Тень для заголовка */
+    font-size: 2.5rem;
+    color: #ffffff;
+    text-align: center;
+    margin-top: 20px;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 2);
 }
 
 table {
-    width: 100%; /* Используем 100% ширины контейнера */
-    max-width: 80%; /* Ограничиваем максимальную ширину таблицы для лучшего центрирования */
+    width: 100%;
+    max-width: 80%;
     border-collapse: collapse;
-    margin: 0 auto; /* Центрируем таблицу */
-    border-radius: 10px; /* Скругление углов таблицы */
-    overflow: hidden; /* Маскируем все, что выходит за границы */
+    margin: 0 auto;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 th, td {
-    border: 2px solid #e6fb00; /* Увеличиваем толщину рамки */
-    padding: 20px; /* Увеличиваем отступы в ячейках */
-    text-align: left; /* Можно изменить на center, если нужно */
-    font-size: 18px; /* Увеличиваем размер шрифта для ячеек */
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 2); /* Добавление тени для всех ячеек */
+    border: 2px solid #e6fb00;
+    padding: 20px;
+    text-align: left;
+    font-size: 18px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 2);
 }
 
 th {
@@ -70,5 +70,5 @@ th {
 }
 
 td {
-    border-radius: 0; /* Уберем кривые углы у ячеек */
+    border-radius: 0;
 }

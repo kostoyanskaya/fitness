@@ -22,7 +22,6 @@ from .schemas import (
     WorkoutSchemaForUsers
 )
 from .validators import validate_registration_data
-from marshmallow import ValidationError
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'register'
@@ -157,13 +156,13 @@ def handle_coaches():
             response = requests.get(photo_url)
             if response.status_code == 200:
                 filename = secure_filename(os.path.basename(photo_url))
-                static_dir = os.path.join('opinions_app', 'static')
+                static_dir = os.path.join('fitness_app', 'static', 'uploads')
                 if not os.path.exists(static_dir):
                     os.makedirs(static_dir)
                 filepath = os.path.join(static_dir, filename)
                 with open(filepath, 'wb') as f:
                     f.write(response.content)
-                photo_path = filename
+                photo_path = os.path.join('uploads', filename)
         except requests.exceptions.RequestException:
             return jsonify('Не удалось загрузить изображение'), 400
     new_coach_data = coach_schema.load(data)

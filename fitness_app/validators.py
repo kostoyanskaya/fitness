@@ -1,7 +1,5 @@
 import re
 
-from flask import jsonify
-
 from .models import User
 
 

@@ -54,20 +54,20 @@
 
 .contacts-container {
     display: flex;
-    justify-content: center;  /* Центрирование по горизонтали */
-    align-items: center;      /* Центрирование по вертикали */
-    height: 100vh;            /* Занимает всю высоту экрана */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     padding: 20px; 
-    width: 100%;       /* Отступы вокруг */
+    width: 100%;
 }
 
 .nesolestag-enadenud {
-    width: 615px;             /* Ширина блока */
-    padding: 20px;            /* Паддинг внутри блока */
-    border: 2px solid #fffb19; /* Граница блока */
-    border-radius: 15px;      /* Закругленные углы */
-    background-color: #000000; /* Цвет фона блока */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Тень для визуального эффекта */
-    margin: 0 auto;           /* Центрирование блока */
+    width: 615px;
+    padding: 20px;
+    border: 2px solid #fffb19;
+    border-radius: 15px;
+    background-color: #000000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
 }
 

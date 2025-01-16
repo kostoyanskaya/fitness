@@ -2,7 +2,7 @@ HTML CSS JSResult Skip Results Iframe
 EDIT ON
 *, *:before, *:after {-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box;margin:0;padding:0}
 body {
-  background-image: url('{{ url_for('static', filename='sport2.jpg') }}');
+  background-image: url('{{ url_for('static', filename='uploads/sport2.jpg') }}');
   background-size: cover;
   background-position: center;
   line-height: 1.5;
@@ -64,32 +64,32 @@ nav li li a:hover{background:#0985d7;background:#FAFBFB}
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 75vh; /* Занять всю высоту экрана */
+  height: 75vh;
 }
 
 .card {
-  border: 2px solid #040507; /* Рамка синего цвета */
-  border-radius: 14px; /* Закругленные углы */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Легкая тень */
+  border: 2px solid #040507;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
-  font-size: 1.5rem; /* Увеличенный размер заголовка */
+  font-size: 1.5rem;
 }
 
 .form-control {
-  font-size: 1.2rem; /* Увеличенный размер шрифта для полей ввода */
+  font-size: 1.2rem;
 }
 
 .btn {
-  font-size: 1.2rem; /* Увеличенный размер кнопки */
+  font-size: 1.2rem;
 }
 .custom-header {
-  margin-right: 20px; /* Ajuste este valor según sea necesario */
+  margin-right: 20px;
 }
 
 .custom-button {
-  margin-right: 20px; /* Ajuste este valor según sea necesario */
+  margin-right: 20px;
 }
 
 *, *:before, *:after {
@@ -104,11 +104,11 @@ html, body {
 }
 
 #header {
-  background: #1E262D; /* ваш фон */
-  width: 100%; /* ширина на 100% от родителя */
-  margin: 0; /* убираем внешние отступы */
-  padding: 0; /* убираем внутренние отступы */
-  position: relative; /* позиционирование относительно */
+  background: #1E262D;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
   height: 120px;
 }
 
@@ -116,13 +116,13 @@ html, body {
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%; /* Убедитесь, что ширина 100% */
-  text-align: center; /* Центрируем текст */
+  width: 100%;
+  text-align: center;
 }
 h1 {
-  font-size: 2.5rem; /* Увеличенный размер шрифта */
-  color: #ffffff; /* Выбор цвета текста (можно изменить на любой другой) */
-  text-align: center; /* Центрирование заголовка */
-  margin-top: 20px; /* Отступ сверху для отделения от верхней части страницы */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Тень для текста */
+  font-size: 2.5rem;
+  color: #ffffff;
+  text-align: center;
+  margin-top: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }

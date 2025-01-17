@@ -1,0 +1,88 @@
+{
+    "users": [
+        {
+            "username": "user1",
+            "email": "user1@example.com",
+            "password": "password1",
+            "is_admin": false
+        },
+        {
+            "username": "admin",
+            "email": "admin@example.com",
+            "password": "adminpassword",
+            "is_admin": true
+        }
+    ],
+    "exercise_types": [
+        {
+            "name": "Силовая тренировка"
+        },
+        {
+            "name": "Кардио"
+        },
+        {
+            "name": "Йога"
+        }
+    ],
+    "days_of_week": [
+        {
+            "name": "Понедельник"
+        },
+        {
+            "name": "Вторник"
+        },
+        {
+            "name": "Среда"
+        },
+        {
+            "name": "Четверг"
+        },
+        {
+            "name": "Пятница"
+        },
+        {
+            "name": "Суббота"
+        },
+        {
+            "name": "Воскресенье"
+        }
+    ],
+    "prices": [
+        {
+            "name": "Абонемент на месяц",
+            "price": 3000.0
+        },
+        {
+            "name": "Разовое посещение",
+            "price": 500.0
+        }
+    ],
+    "coaches": [
+        {
+            "name": "Иван Петров",
+            "photo": "https://example.com/photo1.jpg",
+            "description": "Опытный тренер по силовым тренировкам"
+        },
+        {
+            "name": "Мария Иванова",
+            "photo": "https://example.com/photo2.jpg",
+            "description": "Специалист по кардио и фитнесу"
+        }
+    ],
+    "workouts": [
+        {
+            "exercise_type_id": 1,
+            "day_of_week_id": 1,
+            "coach_id": 1,
+            "date": "2023-10-01",
+            "time": "09:00:00"
+        },
+        {
+            "exercise_type_id": 2,
+            "day_of_week_id": 2,
+            "coach_id": 2,
+            "date": "2023-10-02",
+            "time": "10:00:00"
+        }
+    ]
+}

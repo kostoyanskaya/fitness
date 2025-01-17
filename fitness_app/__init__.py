@@ -17,4 +17,4 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(user_id)
 
-from . import api_views, routes, admin, schemas
+from . import api_views, routes, admin, schemas, data_import

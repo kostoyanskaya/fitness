@@ -33,43 +33,51 @@
                 // Обновляем сообщение о записи на тренировку
                 document.getElementById('bookingMessage').innerText = 'Вы успешно записаны';
             } catch (error) {
-                document.getElementById('bookingMessage').innerText = error.message;
+                document.getElementById('bookingMessage').innerText = error.message; // Здесь можно оставить, если хотите сообщения об ошибках записях
             }
         }
 
         async function fetchWorkouts() {
             try {
                 const response = await fetch('/api/workouts');
-                if (!response.ok) {
-                    throw new Error('Не удалось загрузить тренировки');
-                }
                 const workouts = await response.json();
                 populateWorkoutTable(workouts);
             } catch (error) {
-                alert('Ошибка: ' + error.message);
+                // Ошибка не выводится на экран, просто игнорируем
             }
         }
 
         function populateWorkoutTable(workouts) {
             const tableBody = document.querySelector('#workoutTableBody');
-            tableBody.innerHTML = '';
-            workouts.forEach(workout => {
-                const row = document.createElement('tr');
-                const date = new Date(workout.date).toISOString().split('T')[0];
-                const time = workout.time;
+            const noWorkoutsMessage = document.querySelector('#noWorkoutsMessage');
 
-                row.innerHTML = `
-                    <td>${workout.day_of_week}</td> <!-- Используем уже сериализованное значение -->
-                    <td>${date}</td>
-                    <td>${time}</td>
-                    <td>${workout.exercise_type}</td> <!-- Используем уже сериализованное значение -->
-                    <td>${workout.coach}</td> <!-- Используем уже сериализованное значение -->
-                    <td>
-                        <button onclick="bookWorkout(${workout.id})" class="btn btn-primary">Записаться</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
+            tableBody.innerHTML = '';
+            noWorkoutsMessage.style.display = 'none'; // Скрыть сообщение по умолчанию
+
+            if (workouts.length === 0) {
+                // Если тренировок нет, показываем сообщение
+                noWorkoutsMessage.style.display = 'block';
+                noWorkoutsMessage.innerText = 'На данный момент тренировок нет.';
+            } else {
+                // Если тренировки есть, заполняем таблицу
+                workouts.forEach(workout => {
+                    const row = document.createElement('tr');
+                    const date = new Date(workout.date).toISOString().split('T')[0];
+                    const time = workout.time;
+
+                    row.innerHTML = `
+                        <td>${workout.day_of_week}</td> 
+                        <td>${date}</td>
+                        <td>${time}</td>
+                        <td>${workout.exercise_type}</td> 
+                        <td>${workout.coach}</td> 
+                        <td>
+                            <button onclick="bookWorkout(${workout.id})" class="btn btn-primary">Записаться</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', fetchWorkouts);
@@ -78,24 +86,24 @@
 <body>
     <div class="background-image"></div>
     <div class="container">
-            <div class="training-table">
-                <h2>Расписание тренировок</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>День недели</th>
-                            <th>Дата</th>
-                            <th>Время</th>
-                            <th>Вид занятия</th>
-                            <th>Тренер</th>
-                            <th>Записаться</th>
-                        </tr>
-                    </thead>
-                    <tbody id="workoutTableBody">
-                    </tbody>
-                </table>
-                <div id="bookingMessage" style="color: rgb(255, 255, 255); margin-top: 10px; text-align: center;"></div>
-            </div>
+        <div class="training-table">
+            <h2>Расписание тренировок</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>День недели</th>
+                        <th>Дата</th>
+                        <th>Время</th>
+                        <th>Вид занятия</th>
+                        <th>Тренер</th>
+                        <th>Записаться</th>
+                    </tr>
+                </thead>
+                <tbody id="workoutTableBody">
+                </tbody>
+            </table>
+            <div id="noWorkoutsMessage" style="color: rgb(255, 255, 255); text-align: center; display: none;"></div>
+            <div id="bookingMessage" style="color: rgb(255, 255, 255); margin-top: 10px; text-align: center;"></div>
         </div>
     </div>
 </body>

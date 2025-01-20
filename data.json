@@ -1,16 +1,22 @@
 {
     "users": [
         {
-            "username": "user1",
+            "username": "admin",
+            "email": "adminfitness.com",
+            "password": "adminsport",
+            "is_admin": true
+        },
+        {
+            "username": "Олег",
             "email": "user1@example.com",
             "password": "password1",
             "is_admin": false
         },
         {
-            "username": "admin",
-            "email": "admin@example.com",
-            "password": "adminpassword",
-            "is_admin": true
+            "username": "Таня",
+            "email": "Tanya44@example.com",
+            "password": "Tanyapassword",
+            "is_admin": false
         }
     ],
     "exercise_types": [
@@ -55,34 +61,51 @@
         {
             "name": "Разовое посещение",
             "price": 500.0
+        },
+        {
+            "name": "Абонемент на неделю",
+            "price": 1000.0
         }
     ],
     "coaches": [
         {
             "name": "Иван Петров",
-            "photo": "https://example.com/photo1.jpg",
-            "description": "Опытный тренер по силовым тренировкам"
+            "photo": "uploads/16f829.jpg",
+            "description": "Более 10 лет в тренировках, атлетические достижения на различных соревнованиях по бодибилдингу. Сочетание классических методов (жимы, приседы, становые тяги) с современными подходами."
         },
         {
-            "name": "Мария Иванова",
-            "photo": "https://example.com/photo2.jpg",
-            "description": "Специалист по кардио и фитнесу"
+            "name": "Олег Степанов",
+            "photo": "uploads/f08_upscaled.jpg",
+            "description": "Более 5 лет в области групповых и индивидуальных кардиотренировок. Сочетает интервальные тренировки с элементами функционального тренинга и кроссфита для достижения эффективности."
+
+        },
+        {
+            "name": "Лена Васильева",
+            "photo": "uploads/sca0.png",
+            "description": "Более 8 лет практики йоги, сертифицированный инструктор нескольких стилей (Хатха, Аштанга, Виньяса). Спокойный и интуитивный подход"
         }
     ],
     "workouts": [
         {
             "exercise_type_id": 1,
-            "day_of_week_id": 1,
+            "day_of_week_id": 6,
             "coach_id": 1,
-            "date": "2023-10-01",
+            "date": "2025-03-01",
             "time": "09:00:00"
         },
         {
             "exercise_type_id": 2,
-            "day_of_week_id": 2,
+            "day_of_week_id": 7,
             "coach_id": 2,
-            "date": "2023-10-02",
+            "date": "2025-03-02",
             "time": "10:00:00"
+        },
+        {
+            "exercise_type_id": 3,
+            "day_of_week_id": 1,
+            "coach_id": 3,
+            "date": "2025-03-03",
+            "time": "15:00:00"
         }
     ]
 }

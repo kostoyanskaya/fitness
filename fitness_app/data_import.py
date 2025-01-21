@@ -1,22 +1,17 @@
-import os
-import json
-import click
-from flask import Flask
-from fitness_app import app
-from .decorators import role_required, role_required_for_methods
-from .models import (
-    Booking, Coach, DayOfWeek, ExerciseType,
-    PersonalTraining, Price, User, Workout, db
-)
-import os
-import requests
-from werkzeug.utils import secure_filename
 from datetime import datetime
+import json
+
+import click
 from flask_bcrypt import Bcrypt
 
-# Инициализация Bcrypt
+from fitness_app import app
+from .models import (
+    Coach, DayOfWeek, ExerciseType,
+    Price, User, Workout, db
+)
+
 bcrypt = Bcrypt()
-#flask import-all data.json
+
 
 class BaseImportCommand:
     help = 'Импорт данных из JSON файла'
@@ -25,15 +20,23 @@ class BaseImportCommand:
         objects = []
         for item in data:
             if 'date' in item:
-                item['date'] = datetime.strptime(item['date'], '%Y-%m-%d').date()
+                date_str = item['date']
+                item['date'] = datetime.strptime(date_str, '%Y-%m-%d').date()
+
             if 'time' in item:
-                item['time'] = datetime.strptime(item['time'], '%H:%M:%S').time()
-            if 'password' in item and model_class == User:  # Хешируем пароль, если это пользователь
-                item['password'] = bcrypt.generate_password_hash(item['password']).decode('utf-8')
+                time_str = item['time']
+                item['time'] = datetime.strptime(time_str, '%H:%M:%S').time()
+
+            if 'password' in item and model_class == User:
+                password = item['password']
+                hashed_password = bcrypt.generate_password_hash(password)
+                item['password'] = hashed_password.decode('utf-8')
+
             objects.append(model_class(**item))
         db.session.bulk_save_objects(objects)
         db.session.commit()
         return len(objects)
+
 
 @app.cli.command("import-all")
 @click.argument("json_file")
@@ -46,32 +49,30 @@ def import_all(json_file):
 
     if "users" in data:
         count_users = command.import_data(User, data["users"])
-        print(f"Импортировано {count_users} пользователей.")
         total_imported += count_users
 
     if "exercise_types" in data:
-        count_exercise_types = command.import_data(ExerciseType, data["exercise_types"])
-        print(f"Импортировано {count_exercise_types} типов упражнений.")
+        count_exercise_types = command.import_data(
+            ExerciseType, data["exercise_types"]
+        )
         total_imported += count_exercise_types
 
     if "days_of_week" in data:
-        count_days_of_week = command.import_data(DayOfWeek, data["days_of_week"])
-        print(f"Импортировано {count_days_of_week} дней недели.")
+        count_days_of_week = command.import_data(
+            DayOfWeek, data["days_of_week"]
+        )
         total_imported += count_days_of_week
 
-    if "prices" in data:  # Новый блок для Price
+    if "prices" in data:
         count_prices = command.import_data(Price, data["prices"])
-        print(f"Импортировано {count_prices} цен.")
         total_imported += count_prices
-    
-    if "coaches" in data:  # Новый блок для Coach
+
+    if "coaches" in data:
         count_coaches = command.import_data(Coach, data["coaches"])
-        print(f"Импортировано {count_coaches} тренеров.")
         total_imported += count_coaches
-    
+
     if "workouts" in data:
         count_workouts = command.import_data(Workout, data["workouts"])
-        print(f"Импортировано {count_workouts} тренировок.")
         total_imported += count_workouts
-    
+
     print(f"Всего импортировано {total_imported} записей.")

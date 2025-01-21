@@ -139,10 +139,9 @@
             } else {
                 messageContainer.style.color = 'red';
                 messageContainer.innerText = result.message || 'Произошла непредвиденная ошибка';
-                // Отображение сообщения об ошибке под формой
                 const successTextContainer = document.querySelector('.successtext');
                 successTextContainer.innerText = result.message || 'Данные введены неверно, попробуйте еще раз.';
-                successTextContainer.style.display = 'block'; // Убедитесь, что контейнер видим
+                successTextContainer.style.display = 'block';
             }
         };
 

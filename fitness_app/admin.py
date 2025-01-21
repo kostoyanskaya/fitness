@@ -93,7 +93,9 @@ class CoachModelView(AdminModelView):
     def _handle_file_upload(self, form, model):
         if form.photo.data:
             filename = secure_filename(form.photo.data.filename)
-            filepath = os.path.join('fitness_app', 'static', 'uploads', filename)
+            filepath = os.path.join(
+                'fitness_app', 'static', 'uploads', filename
+            )
             form.photo.data.save(filepath)
             model.photo = os.path.join('uploads', filename)
 

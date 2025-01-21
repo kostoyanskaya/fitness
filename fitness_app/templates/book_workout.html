@@ -30,10 +30,9 @@
                     throw new Error(result);
                 }
 
-                // Обновляем сообщение о записи на тренировку
                 document.getElementById('bookingMessage').innerText = 'Вы успешно записаны';
             } catch (error) {
-                document.getElementById('bookingMessage').innerText = error.message; // Здесь можно оставить, если хотите сообщения об ошибках записях
+                document.getElementById('bookingMessage').innerText = error.message;
             }
         }
 
@@ -43,7 +42,6 @@
                 const workouts = await response.json();
                 populateWorkoutTable(workouts);
             } catch (error) {
-                // Ошибка не выводится на экран, просто игнорируем
             }
         }
 
@@ -52,14 +50,12 @@
             const noWorkoutsMessage = document.querySelector('#noWorkoutsMessage');
 
             tableBody.innerHTML = '';
-            noWorkoutsMessage.style.display = 'none'; // Скрыть сообщение по умолчанию
+            noWorkoutsMessage.style.display = 'none';
 
             if (workouts.length === 0) {
-                // Если тренировок нет, показываем сообщение
                 noWorkoutsMessage.style.display = 'block';
                 noWorkoutsMessage.innerText = 'На данный момент тренировок нет.';
             } else {
-                // Если тренировки есть, заполняем таблицу
                 workouts.forEach(workout => {
                     const row = document.createElement('tr');
                     const date = new Date(workout.date).toISOString().split('T')[0];

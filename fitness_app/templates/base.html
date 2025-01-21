@@ -9,8 +9,8 @@
   <style>
     body {
         background-image: url('{{ url_for("static", filename="uploads/sport2.jpg") }}');
-        background-size: cover; /* Это растянет изображение так, чтобы оно заполнило весь фон */
-        background-position: center; /* Центрируем изображение */
+        background-size: cover;
+        background-position: center;
         line-height: 1.5;
         font-family: sans-serif;
         text-transform: uppercase;
@@ -62,11 +62,11 @@
   </nav>
 </div>
 <script>
-  document.addEventListener('DOMContentLoaded', function() { // Ждем, пока документ загрузится
+  document.addEventListener('DOMContentLoaded', function() {
       const logoutButton = document.getElementById('logout-button');
       if (logoutButton) {
           logoutButton.onclick = async (e) => {
-              e.preventDefault(); // Предотвращаем переход по ссылке
+              e.preventDefault();
 
               const response = await fetch('/api/logout', {
                   method: 'POST',
@@ -76,8 +76,7 @@
               });
 
               if (response.ok) {
-                  // Если выход успешен, перенаправляем на страницу входа или главную
-                  window.location.href = '/home'; // или '/home'
+                  window.location.href = '/home';
               } else {
                   console.error('Ошибка выхода');
               }

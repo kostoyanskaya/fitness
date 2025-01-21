@@ -9,17 +9,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                const userResponse = await fetch('/api/users/{{ current_user.id }}'); // Получаем данные о пользователе
+                const userResponse = await fetch('/api/users/{{ current_user.id }}');
                 if (!userResponse.ok) {
                     throw new Error('Ошибка загрузки данных о пользователе');
                 }
                 const userData = await userResponse.json();
 
-                // Отображаем информацию о пользователе
-                document.getElementById('user-name').innerText = userData.username; // предполагается, что поле username
+                document.getElementById('user-name').innerText = userData.username;
                 document.getElementById('user-email').innerText = userData.email;
-
-                // Запрос на получение тренировок
                 const trainingResponse = await fetch('/api/user/trainings');
                 if (!trainingResponse.ok) {
                     throw new Error('Ошибка загрузки тренировок');
@@ -78,7 +75,7 @@
         }
         function loadUserTrainings() {
             const workoutsTableBody = document.getElementById('workoutsTable').getElementsByTagName('tbody')[0];
-            workoutsTableBody.innerHTML = ''; // Очищаем таблицу
+            workoutsTableBody.innerHTML = '';
 
             fetch('/api/trainings')
                 .then(response => response.json())
@@ -131,8 +128,8 @@
                 .catch(error => {
                     console.error('Ошибка при отмене бронирования:', error.message);
                     const cancelMessage = document.getElementById('cancelMessage');
-                    cancelMessage.innerText = error.message || 'Не удалось отменить бронирование.'; // Выводим сообщение об ошибке
-                    cancelMessage.style.color = 'red'; // цвет текста для ошибки
+                    cancelMessage.innerText = error.message || 'Не удалось отменить бронирование.';
+                    cancelMessage.style.color = 'red';
                 });
         }
 
@@ -162,7 +159,7 @@
                         console.error('Ошибка при отмене бронирования:', error.message);
                         const cancelMessage = document.getElementById('cancelMessage');
                         cancelMessage.innerText = error.message || 'Не удалось отменить бронирование.'; // Выводим сообщение об ошибке
-                        cancelMessage.style.color = 'red'; // цвет текста для ошибки
+                        cancelMessage.style.color = 'red';
                     });
             }
 

@@ -23,5 +23,9 @@ def validate_registration_data(fullname, email, password, confirmpassword):
     if password != confirmpassword:
         return 'Пароли не совпадают!', 400
     if not validate_password(password):
-        return 'Пароль должен содержать минимум 8 символов, включая хотя бы одну цифру и не должен содержать специальных символов.', 400
+        error_message = (
+            'Пароль должен содержать минимум 8 символов, включая хотя бы одну '
+            'цифру и не должен содержать специальных символов.'
+        )
+        return error_message, 400
     return None

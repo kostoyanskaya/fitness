@@ -62,3 +62,13 @@ def search():
 @app.route('/redirect_to/<filename>')
 def redirect_to_template(filename):
     return render_template(filename, static_url=url_for('static', filename=''))
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return render_template('500.html'), 500

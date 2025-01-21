@@ -2,8 +2,8 @@
     "users": [
         {
             "username": "admin",
-            "email": "adminfitness.com",
-            "password": "adminsport",
+            "email": "admin@example.com",
+            "password": "adminsport1",
             "is_admin": true
         },
         {
@@ -14,8 +14,8 @@
         },
         {
             "username": "Таня",
-            "email": "Tanya44@example.com",
-            "password": "Tanyapassword",
+            "email": "tanya44@example.com",
+            "password": "tanyapassword5",
             "is_admin": false
         }
     ],

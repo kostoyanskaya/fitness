@@ -44,6 +44,7 @@ def get_users():
     users_list = user_schema.dump(users)
     return jsonify(users_list), 200
 
+
 @app.route('/api/users/<int:user_id>', methods=['GET'])
 @login_required
 def get_user(user_id):
@@ -51,7 +52,7 @@ def get_user(user_id):
     if user is None:
         abort(404)
     user_schema = UserSchema()
-    return jsonify(user_schema.dump(user)), 200 
+    return jsonify(user_schema.dump(user)), 200
 
 
 @app.route('/api/logout', methods=['POST'])

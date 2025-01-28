@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesperson.css') }}">
     <title>Личный кабинет</title>
+    <button id="logout-button" class="logout-button">Выйти</button>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             try {
@@ -162,15 +163,36 @@
                         cancelMessage.style.color = 'red';
                     });
             }
-
-    </script>
+        </script>
 </head>
 <body>
-    <div class="personal-account-container">
+    <div class="personal-account-container"> <!-- Position relative для контейнера -->
         <div class="user-info">
             <div class="user-name" id="user-name">Загрузка имени...</div>
             <div class="user-email" id="user-email">Загрузка email...</div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const logoutButton = document.getElementById('logout-button');
+    
+                if (logoutButton) {
+                    logoutButton.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        
+                        const response = await fetch('/api/logout', {
+                            method: 'POST',
+                            credentials: 'same-origin'
+                        });
+    
+                        if (response.ok) {
+                            window.location.href = '/home';
+                        } else {
+                            console.error('Ошибка при выходе.');
+                        }
+                    });
+                }
+            });
+        </script>
         <div class="user-image">
             <img src="{{ url_for('static', filename='uploads/sport.jpg') }}" alt="User Image">
         </div>

@@ -1,11 +1,9 @@
-
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
 }
-
 
 .personal-account-container {
     display: flex;
@@ -18,27 +16,27 @@ html, body {
     box-shadow: 0 0 10px rgba(241, 240, 240, 0.1);
     max-width: 800px;
     margin: 20px auto;
+    width: 100%;
 }
-
 
 .user-info {
     text-align: center;
     margin-bottom: 20px;
 }
 
+.user-name, .user-email {
+    color: #ffffff;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 2);
+}
+
 .user-name {
     font-size: 24px;
     font-weight: bold;
-    color: #ffffff;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 2);
 }
 
 .user-email {
     font-size: 16px;
-    color: #ffffff;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 2);
 }
-
 
 .user-image img {
     width: 150px;
@@ -47,7 +45,6 @@ html, body {
     border: 3px solid #ddd;
     margin-bottom: 20px;
 }
-
 
 #workoutsTable, #personalWorkoutsTable {
     width: 100%;
@@ -66,6 +63,8 @@ html, body {
 #workoutsTable td, #personalWorkoutsTable td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
+    word-wrap: break-word; /* Добавлено, чтобы избежать переполнения */
+    max-width: 150px; /* Ограничение ширины ячеек */
 }
 
 #workoutsTable tr:hover, #personalWorkoutsTable tr:hover {
@@ -86,4 +85,53 @@ html, body {
 
 .btn-danger:hover {
     background-color: #c1b138;
+}
+
+.logout-button {
+    position: fixed; /* Зафиксировать позицию кнопки относительно окна */
+    bottom: 20px; /* Отступ от нижней части окна */
+    right: 20px; /* Отступ от правой стороны окна */
+    background-color: #f44336; /* Цвет фона кнопки */
+    color: white; /* Цвет текста кнопки */
+    border: none; /* Без рамки */
+    padding: 10px 15px; /* Внутренние отступы */
+    border-radius: 5px; /* Закругленные углы */
+    cursor: pointer; /* Курсор-указатель при наведении */
+    z-index: 1000; /* Обеспечьте, чтобы кнопка была выше других элементов */
+}
+
+/* Эффект при наведении */
+.logout-button:hover {
+    background-color: #d32f2f; /* Цвет кнопки при наведении */
+}
+/* Мобильные стили */
+@media screen and (max-width: 600px) {
+    .personal-account-container {
+        padding: 9px;
+    }
+
+    .user-name {
+        font-size: 20px;
+    }
+
+    .user-email {
+        font-size: 14px;
+    }
+
+    #workoutsTable th, #personalWorkoutsTable th,
+    #workoutsTable td, #personalWorkoutsTable td {
+        font-size: 8px; /* Уменьшаем размер шрифта заголовков и ячеек */
+        padding: 3px; /* Уменьшаем отступы */
+    }
+
+    #workoutsTable th,
+    #personalWorkoutsTable th {
+        word-wrap: break-word; /* Перенос текста при необходимости */
+        max-width: 80px; /* Ограничиваем ширину заголовков */
+    }
+
+    .user-image img {
+        width: 100px;
+        height: 100px;
+    }
 }

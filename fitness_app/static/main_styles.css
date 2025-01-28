@@ -34,22 +34,18 @@ nav li li a:hover{background:#0985d7;background:#FAFBFB}
   nav{display:block!important}
 }
 @media only screen and (max-width: 959px) {
-  nav{display:none;width:100%;clear:both;float:none;max-height:400px;overflow-y:scroll}
-  #menu-icon{display:inline;top:45px;cursor:pointer}
-  #menu-icon.active .first{transform:rotate(45deg);-webkit-transform:rotate(45deg);margin-top:10px}
-  #menu-icon.active .second{transform:rotate(135deg);-webkit-transform:rotate(135deg);position:relative;top:-9px;}
-  #menu-icon.active .third{display:none}
-  .search{float:none}
-  .search input{width:100%}
-  nav{padding:10px}
-  nav ul{float:none}
-  nav li{float:none}
-  nav ul li a{float:none;padding:8px;display:block}
-  #header nav ul ul{display:block;position:static;background:none;border:none;padding:0}
-  #header nav a{color:#f8f8f8;padding:8px}
-  #header nav a:hover{background:#fff;color:#333;border-radius:3px}
-  #header nav ul li li a:before{content:"- "}
-  .mega-col{width:100%}
+  nav {
+      display: none;
+      /* Убедитесь, что это, действительно, скрывает меню, когда оно не нужно */
+  }
+  #menu-icon {
+      display: inline;
+      /* Позволяет показывать иконку для открытия меню */
+  }
+  /* Настройте вид меню при его открытии */
+  nav.active {
+      display: block; /* Это должно показывать ваше меню, когда оно активно */
+  }
 }
 .login-container {
   display: flex;
@@ -116,4 +112,41 @@ h1 {
   text-align: center;
   margin-top: 20px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+/* Стили для мобильного меню */
+#mobile-nav {
+    position: fixed;
+    top: 0;
+    right: -250px; /* Скрыто за границей экрана */
+    width: 250px;
+    height: 100%;
+    background-color: black; /* Цвет фона меню */
+    transition: right 0.3s ease; /* Анимация для плавного выдвижения */
+    z-index: 1000; /* Чтобы быть сверху других элементов */
+    padding: 20px;
+}
+
+#mobile-nav.active {
+    right: 0; /* Показываем меню, когда добавлен класс active */
+}
+
+#menu-icon {
+    cursor: pointer;
+}
+
+/* Стили для кнопок в меню */
+#mobile-nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+#mobile-nav ul li {
+    margin: 15px 0; /* Отступ между кнопками */
+}
+
+/* Скрытие мобильного меню для компьютеров */
+@media screen and (min-width: 768px) {
+    #mobile-nav {
+        display: none; /* Скрываем для более широких экранов */
+    }
 }

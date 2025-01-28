@@ -22,6 +22,7 @@ body {
     width: calc(33% - 20px);
     padding: 15px;
     text-align: center;
+    flex: 1 1 300px;
 }
 
 .coach-photo {
@@ -58,4 +59,24 @@ body {
 
 .btn-book:hover {
     background-color: #fefefe;
+}
+/* Media Queries для мобильных устройств */
+@media (max-width: 768px) {
+    .coach-card {
+        width: calc(50% - 20px); /* Два элемента в строке на маленьких экранах */
+    }
+}
+
+@media (max-width: 480px) {
+    .coach-card {
+        width: 100%; /* Один элемент на строку для очень маленьких экранов */
+    }
+
+    h1 {
+        font-size: 1.5em; /* Уменьшение размера заголовка на малых экранах */
+    }
+
+    .booking-form label {
+        font-size: 0.9em; /* Меньший размер шрифта для меток */
+    }
 }

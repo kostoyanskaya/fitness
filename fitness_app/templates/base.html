@@ -20,11 +20,11 @@
 
         a { text-decoration: none; color: #fff; }
 
-        /* Стили для мобильного меню */
+
         #mobile-nav {
             position: fixed;
             top: 0;
-            right: -250px; /* Скрыто за границей экрана */
+            right: -250px;
             width: 250px;
             height: 100%;
             background-color: black; /* Цвет фона меню */
@@ -41,20 +41,18 @@
             cursor: pointer;
         }
 
-        /* Стили для кнопок в меню */
         #mobile-nav ul {
             list-style: none;
             padding: 0;
         }
 
         #mobile-nav ul li {
-            margin: 15px 0; /* Отступ между кнопками */
+            margin: 15px 0;
         }
 
-        /* Скрытие мобильного меню для компьютеров */
         @media screen and (min-width: 768px) {
             #mobile-nav {
-                display: none; /* Скрываем для более широких экранов */
+                display: none;
             }
         }
     </style>
@@ -70,22 +68,13 @@
         <span class="second"></span>
         <span class="third"></span>
     </div>
-    
-    <!-- Перемещено сюда -->
+
     <nav id="mobile-nav">
         <ul>
             <li><a href="{{ url_for('index_view') }}">О нас</a></li>
-            <li>
-                <a href="{{ url_for('book_workout') }}">Расписание</a>
-                <ul class="mega-dropdown">
-                    <li class="row">
-                        <ul class="mega-col">
-                            <li><a href="#"></a></li>
-                            <li><a href="{{ url_for('price_view') }}">Ценообразование</a></li>
-                        </ul>
-                    </li>
-                </ul>        
-            </li>
+            <li><a href="{{ url_for('book_workout') }}">Расписание</a></li>
+
+            <li><a href="{{ url_for('price_view') }}">Ценообразование</a></li>
             <li class="dropdown">
                 <a href="{{ url_for('me_view') }}">Личные тренировки</a>
                 <ul>
@@ -129,7 +118,7 @@
                       <li><a href="{{ url_for('register') }}">Вход/Регистрация</a></li>
                     {% endif %}
                     {% if current_user.is_authenticated %}
-                      <li><a href="#" id="logout-button">Выйти</a></li>
+                       <li><a href="#" id="logout-button" onclick="logout()">Выйти</a></li>
                     {% endif %}
                 </ul>        
             </li>
@@ -139,28 +128,26 @@
     </nav>
 </div>
 <script>
-  document.addEventListener('DOMContentLoaded', function() { // Ждем, пока документ загрузится
-      const logoutButton = document.getElementById('logout-button');
-      if (logoutButton) {
-          logoutButton.onclick = async (e) => {
-              e.preventDefault(); // Предотвращаем переход по ссылке
+    async function logout() {
+        try {
+            const response = await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-              const response = await fetch('/api/logout', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                  },
-              });
-
-              if (response.ok) {
-                  // Если выход успешен, перенаправляем на страницу входа или главную
-                  window.location.href = '/home'; // или '/home'
-              } else {
-                  console.error('Ошибка выхода');
-              }
-          };
-      }
-  });
+            if (response.ok) {
+                const message = await response.json();
+                window.location.href = "{{ url_for('index_view') }}";
+            } else {
+                alert('Ошибка выхода. Попробуйте снова.');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка. Попробуйте еще раз.');
+        }
+    }
 </script>
 
 <script>

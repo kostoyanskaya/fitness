@@ -76,16 +76,16 @@ td {
 
 @media (max-width: 768px) {
     .training-table {
-        width: 27%; /* изменено с 33.33% на 22% */
-        padding: 7px; /* уменьшено с 10px на 5px */
+        width: 27%;
+        padding: 7px;
     }
 
     th, td {
-        font-size: 0.50rem; /* изменено с 0.65rem на 0.43rem */
-        padding: 4px; /* уменьшено с 5px на 3px */
+        font-size: 0.50rem;
+        padding: 4px;
     }
 
     .training-table h2 {
-        font-size: 1.2rem; /* изменено с 1.5rem на 1rem */
+        font-size: 1.2rem;
     }
 }

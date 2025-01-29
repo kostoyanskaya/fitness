@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='stylesperson.css') }}">
     <title>Личный кабинет</title>
-    <button id="logout-button" class="logout-button">Выйти</button>
+    <button id="logout-button" onclick="logout()">Выйти</button>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             try {
@@ -172,26 +172,26 @@
             <div class="user-email" id="user-email">Загрузка email...</div>
         </div>
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const logoutButton = document.getElementById('logout-button');
-    
-                if (logoutButton) {
-                    logoutButton.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        
-                        const response = await fetch('/api/logout', {
-                            method: 'POST',
-                            credentials: 'same-origin'
-                        });
-    
-                        if (response.ok) {
-                            window.location.href = '/home';
-                        } else {
-                            console.error('Ошибка при выходе.');
+            async function logout() {
+                try {
+                    const response = await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
                         }
                     });
+        
+                    if (response.ok) {
+                        const message = await response.json();
+                        window.location.href = "{{ url_for('index_view') }}";
+                    } else {
+                        alert('Ошибка выхода. Попробуйте снова.');
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка. Попробуйте еще раз.');
                 }
-            });
+            }
         </script>
         <div class="user-image">
             <img src="{{ url_for('static', filename='uploads/sport.jpg') }}" alt="User Image">

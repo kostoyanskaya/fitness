@@ -115,6 +115,16 @@ h1 {
       }
 
     }
+
+.accordion-item {
+  width: 20.666%;
+  transition: all 500ms ease;
+  position: relative;
+}
+
+.accordion-item a {
+  padding: 40px 20px;
+}
     
     // Background images
     li:nth-child(1) { background-image:url('https://amiel.club/uploads/posts/2022-03/1647619760_1-amiel-club-p-kartinki-sportzala-1.jpg'); }
@@ -183,34 +193,11 @@ h1 {
 
 }
 
-// Stack items
-@media screen and (max-width: 700px) {
-  
-  // IE gets fussy if this isn't here
-  body { margin:0; }
-  
-  .accordion {
-    
-    height:auto;
-    
-    ul,ul:hover {
-      
-      li,li:hover {
-        
-        position:relative;
-        display:table;
-        table-layout:fixed;
-        width:100%;
-        
-        -webkit-transition:none;
-        transition:none;
-        
-      }
-      
-    }
-    
+@media (max-width: 768px) {
+  .accordion h2,
+  .accordion p {
+    display: none; 
   }
-
 }
 
 .about {

@@ -36,15 +36,13 @@ nav li li a:hover{background:#0985d7;background:#FAFBFB}
 @media only screen and (max-width: 959px) {
   nav {
       display: none;
-      /* Убедитесь, что это, действительно, скрывает меню, когда оно не нужно */
   }
   #menu-icon {
       display: inline;
-      /* Позволяет показывать иконку для открытия меню */
   }
-  /* Настройте вид меню при его открытии */
+
   nav.active {
-      display: block; /* Это должно показывать ваше меню, когда оно активно */
+      display: block;
   }
 }
 .login-container {
@@ -113,40 +111,39 @@ h1 {
   margin-top: 20px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
-/* Стили для мобильного меню */
+
 #mobile-nav {
     position: fixed;
     top: 0;
-    right: -250px; /* Скрыто за границей экрана */
+    right: -250px;
     width: 250px;
     height: 100%;
-    background-color: black; /* Цвет фона меню */
-    transition: right 0.3s ease; /* Анимация для плавного выдвижения */
-    z-index: 1000; /* Чтобы быть сверху других элементов */
+    background-color: black;
+    transition: right 0.3s ease;
+    z-index: 1000;
     padding: 20px;
 }
 
 #mobile-nav.active {
-    right: 0; /* Показываем меню, когда добавлен класс active */
+    right: 0;
 }
 
 #menu-icon {
     cursor: pointer;
 }
 
-/* Стили для кнопок в меню */
 #mobile-nav ul {
     list-style: none;
     padding: 0;
 }
 
 #mobile-nav ul li {
-    margin: 15px 0; /* Отступ между кнопками */
+    margin: 15px 0;
 }
 
-/* Скрытие мобильного меню для компьютеров */
+
 @media screen and (min-width: 768px) {
     #mobile-nav {
-        display: none; /* Скрываем для более широких экранов */
+        display: none;
     }
 }

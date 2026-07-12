@@ -1,108 +1,108 @@
-#  Проект: Фитнесайт
-«Фитнесайт» — это современный веб-ресурс, посвященный  спортивному залу, где активный образ жизни стоят в центре внимания. На сайте пользователи смогут легко ознакомиться с полной информацией о нашем фитнес-центре: от расписания тренировок до фото.
-Здесь вы найдете  профили наших тренеров, которые готовы поделиться своими знаниями и опытом, а также различными программами тренировок, подходящими для людей с разным уровнем подготовки. Просмотр цен на абонементы и отдельные занятия поможет пользователям сделать осознанный выбор.
+# Project: Fitnesite
+"Fitnesite" is a modern web resource dedicated to a gym, where an active lifestyle is the center of attention. On the website, users can easily find complete information about our fitness center: from the training schedule to photos.
+Here you will find profiles of our trainers, who are ready to share their knowledge and experience, as well as various training programs suitable for people with different levels of preparation. Viewing prices for memberships and individual classes will help users make an informed choice.
 
-После регистрации на «Фитнесайте» пользователи получат доступ к личному кабинету, где смогут записываться на персональные или групповые тренировки, а также управлять своим расписанием. Все запланированные занятия будут видны в личном профиле, что обеспечивает максимальную гибкость. В случае необходимости, пользователи могут легко отменить любое занятие, сохраняя при этом полный контроль над своим временем.
+After registering on "Fitnesite," users will get access to a personal account, where they can sign up for personal or group training sessions, as well as manage their schedule. All scheduled classes will be visible in the personal profile, ensuring maximum flexibility. If necessary, users can easily cancel any class, while maintaining full control over their time.
 
-С «Фитнесайтом» вы будете ближе к своим фитнес-целям, получая возможность заниматься в удобное для вас время в компании профессиональных тренеров и единомышленников!
+With "Fitnesite," you will be closer to your fitness goals, getting the opportunity to work out at a convenient time for you in the company of professional trainers and like-minded people!
 
-Сайт находится в процессе обновления и улучшения.
+The site is currently being updated and improved.
 
-### Основные возможности:
-Основные возможности:
+### Main features:
+Main features:
 
-- Полная информация о фитнес-центре, включая расписание тренировок и фото зала.
+- Complete information about the fitness center, including the training schedule and photos of the gym.
 
-- Профили тренеров с описанием их опыта и методик.
+- Trainer profiles with a description of their experience and methods.
 
-- Информация о ценах на абонементы и индивидуальные занятия для осознанного выбора.
+- Information on membership and individual class prices for an informed choice.
 
-- Регистрация пользователей для получения доступа к личному кабинету.
+- User registration to gain access to the personal account.
 
-- Возможность записи на персональные и групповые тренировк.
+- Ability to sign up for personal and group training sessions.
 
-- Управление расписанием тренировок с возможностью просмотра запланированных занятий.
+- Managing the training schedule with the ability to view scheduled classes.
 
-- Функция отмены записанных тренировок для обеспечения гибкости в планировании.
-
-
-### В проекте используются  основные следующие технологии и библиотеки:
-
-Flask (==2.0.2): Легковесный веб-фреймворк на Python, который обеспечивает простоту и гибкость разработки веб-приложений. Используется как основной фреймворк для создания серверной части приложения.
-
-Flask-SQLAlchemy (==2.5.1): Расширение для Flask, которое помогает интегрировать ORM (Object Relational Mapping) в приложения на Python, упрощая работу с базами данных.
-
-Flask-Migrate (==3.1.0): Дополнение для Flask, которое упрощает миграцию базы данных, позволяя управлять изменениями схемы базы данных с помощью Alembic.
-
-Alembic (==1.14.0): Инструмент для управления миграциями схемы базы данных в SQLAlchemy. Позволяет создавать и изменять структуры базы данных в контролируемом и последовательном порядке.
-
-PostgreSQL: Реляционная система управления базами данных (СУБД), которая используется в проекте для надежного хранения и управления данными пользователей, тренировок и прочей информации.
-Flask-Login (==0.6.3): Библиотека для управления сессиями пользователей, обеспечивающая функциональность входа и выхода для пользователей приложения.
-
-Flask-WTF (==1.0.0): Расширение для Flask, предоставляющее интеграцию с библиотеками для обработки форм, включая защиту от CSRF-атак.
-
-Flask-Admin (==1.5.8): Удобный интерфейс для администрирования базы данных, позволяющий разработчикам быстро создавать панели управления для управления контентом приложения.
-
-Flask-Bcrypt (==1.0.1): Библиотека для хеширования паролей, обеспечивающая защиту конфиденциальной информации пользователей.
-
-psycopg2-binary (==2.9.10): PostgreSQL адаптер для Python, который позволяет взаимодействовать с базой данных PostgreSQL.
-
-marshmallow (==3.23.2): Библиотека для сериализации и десериализации объектов, позволяющая легко обмениваться данными между приложением и клиентом.
-
-WTForms (==3.0.0): Библиотека для работы с формами, которая упрощает создание и валидацию форм в веб-приложениях.
-
-requests (==2.32.3): Библиотека для удобного выполнения HTTP-запросов, которая упрощает взаимодействие с внешними API.
-
-Jinja2 (==3.0.3): Шаблонизатор, встроенный в Flask, позволяет легко генерировать HTML с использованием шаблонов.
-
-bcrypt (==4.2.1): Библиотека для хеширования паролей с использованием алгоритма Bcrypt, обеспечивающая высокую степень безопасности.
-
-python-dotenv (==0.19.2): Пакет для загрузки конфигурационных переменных из файла .env, что помогает управлять настройками приложения.
-
-Werkzeug (==2.0.2): Библиотека для создания веб-приложений и отладки, которая является основой для Flask и предоставляет низкоуровневые инструменты для работы с WSGI.
+- Function to cancel scheduled training sessions to ensure flexibility in planning.
 
 
+### The project mainly uses the following technologies and libraries:
 
-## Установка проекта на удаленном сервере:
+Flask (==2.0.2): A lightweight Python web framework that provides simplicity and flexibility in web application development. Used as the main framework for creating the server side of the application.
 
-1. Клонирование репозитория
+Flask-SQLAlchemy (==2.5.1): An extension for Flask that helps integrate ORM (Object Relational Mapping) into Python applications, simplifying work with databases.
+
+Flask-Migrate (==3.1.0): An add-on for Flask that simplifies database migration, allowing you to manage database schema changes using Alembic.
+
+Alembic (==1.14.0): A tool for managing database schema migrations in SQLAlchemy. Allows you to create and change database structures in a controlled and consistent order.
+
+PostgreSQL: A relational database management system (DBMS), which is used in the project for reliable storage and management of user data, training sessions, and other information.
+Flask-Login (==0.6.3): A library for managing user sessions, providing login and logout functionality for application users.
+
+Flask-WTF (==1.0.0): An extension for Flask, providing integration with libraries for form processing, including protection against CSRF attacks.
+
+Flask-Admin (==1.5.8): A convenient interface for database administration, allowing developers to quickly create control panels for managing application content.
+
+Flask-Bcrypt (==1.0.1): A library for password hashing, providing protection for users' confidential information.
+
+psycopg2-binary (==2.9.10): A PostgreSQL adapter for Python, which allows interaction with the PostgreSQL database.
+
+marshmallow (==3.23.2): A library for object serialization and deserialization, allowing easy data exchange between the application and the client.
+
+WTForms (==3.0.0): A library for working with forms, which simplifies the creation and validation of forms in web applications.
+
+requests (==2.32.3): A library for convenient execution of HTTP requests, which simplifies interaction with external APIs.
+
+Jinja2 (==3.0.3): A template engine built into Flask, allows you to easily generate HTML using templates.
+
+bcrypt (==4.2.1): A library for password hashing using the Bcrypt algorithm, providing a high degree of security.
+
+python-dotenv (==0.19.2): A package for loading configuration variables from a .env file, which helps manage application settings.
+
+Werkzeug (==2.0.2): A library for creating web applications and debugging, which is the foundation for Flask and provides low-level tools for working with WSGI.
+
+
+
+## Installing the project on a remote server:
+
+1. Cloning the repository
 ```
 git@github.com:kostoyanskaya/fitness.git
 ```
 
-2. Переход в директорию fitness
+2. Navigate to the fitness directory
 
 ```
 cd fitness
 ```
 
-3. Создание виртуального окружения
+3. Creating a virtual environment
 
 ```
 python -m venv venv
 ```
 
-4. Активация виртуального окружения
+4. Activating the virtual environment
 
 ```
 source venv/Scripts/activate
 ```
 
-5. Обновите pip
+5. Update pip
 
 ```
 python -m pip install --upgrade pip
 ```
 
-6. Установка зависимостей
+6. Installing dependencies
 
 ```
 pip install -r requirements.txt
 ```
 
-7. Нужно создать фаил .env
+7. You need to create a .env file
 
-8. Заполнить по примеру
+8. Fill it out according to the example
 
 ```
 FLASK_APP=fitness_app
@@ -111,7 +111,7 @@ DATABASE_URI=postgresql://username:password@localhost:5432/database_name
 SECRET_KEY=YOUR_SECRET_KEY
 ```
 
-9. Выполнить команды:
+9. Run the commands:
 ```
 flask db init
 flask db migrate
@@ -119,18 +119,18 @@ flask db upgrade
 
 ```
 
-10. Запустить объекты в базу:
+10. Load objects into the database:
 
 ```
 flask import-all data.json
 ```
-10. Запустить сайт:
+10. Run the site:
 
 ```
 flask run
 ```
 
-## Пример запроса:
+## Example request:
 
 
 ```
@@ -146,5 +146,5 @@ body:
 }
 ```
 
-## Автор
-#### [_Виктория_](https://github.com/kostoyanskaya/)
+## Author
+#### [_Victoria_](https://github.com/kostoyanskaya/)
